@@ -1,55 +1,49 @@
 name: basic_test_workflow
 dag_type: plain_text
-description: Generated workflow from UI.
+description: A detailed test workflow that sets up a temporary environment, runs a
+  simple echo command, validates its output, and summarizes the results in a human‑readable
+  paragraph.
 nodes:
   prepare_test_environment:
     name: prepare_test_environment
     nodes_depended_on: []
     nodes_dependent_on: []
-    prompt: Construct a temporary directory named `test_env` in the current working
-      directory. Verify the availability of fundamental system tools (e.g., `echo`,
-      `ls`, and `mkdir`) required for the test workflow. Ensure that the test environment
-      is isolated from the rest of the system and can be safely deleted after use.
-    description: Prepare a self-contained temporary test environment to isolate test
-      dependencies and verify the availability of essential system tools. This environment
-      is designed to be ephemeral, allowing for safe and predictable testing without
-      compromising the system's stability or security.
+    prompt: Create a temporary directory called `test_env` in the current working
+      directory. Confirm that the utilities `echo`, `ls`, and `mkdir` are available
+      in the system PATH. Ensure the directory is isolated from other system files
+      and can be removed safely after the test completes.
+    description: Establish an isolated, disposable test environment and verify that
+      essential system tools are present.
     agent: false
   execute_test:
     name: execute_test
     nodes_depended_on:
     - prepare_test_environment
     nodes_dependent_on: []
-    prompt: Given the "test_env" environment prepared by the preceding node and the
-      required tools verified by that node, execute `echo TEST_PASSED` and capture
-      the standard output string as raw_output.
-    description: Executes a simple test inside the prepared environment, capturing
-      its stdout output and returning it in the raw_output field, while ensuring the
-      test can utilize the environment prepared by the preceding "prepare_test_environment"
-      node.
+    prompt: Using the `test_env` directory created by the previous step, run the command
+      `echo TEST_PASSED` and capture its standard output exactly as a string in the
+      field `raw_output`.
+    description: Run a simple echo command in the prepared environment and record
+      its output.
     agent: false
   collect_test_output:
     name: collect_test_output
     nodes_depended_on:
     - execute_test
     nodes_dependent_on: []
-    prompt: Inspect the `raw_output` of the test command for the exact presence of
-      the `TEST_PASSED` substring, and construct a JSON object containing fields `test_status`
-      and `raw_output` to report the test outcome based on the inspection result.
-    description: Rigorously examine the `raw_output` from the test command, confirming
-      the presence of `TEST_PASSED` to signify test success and accurately reporting
-      the result in a JSON object with fields `test_status` and `raw_output`, as informed
-      by the output of the `execute_test` node.
+    prompt: 'Check the `raw_output` produced by the test command for the exact substring
+      `TEST_PASSED`. Construct a JSON object with two fields: `test_status` (set to
+      "PASSED" if the substring is found, otherwise "FAILED") and `raw_output` containing
+      the captured string.'
+    description: Validate the test output and format the result as JSON.
     agent: false
   summarize_test_results:
     name: summarize_test_results
     nodes_depended_on:
     - collect_test_output
     nodes_dependent_on: []
-    prompt: Produce a clear, detailed paragraph summarizing the test result, specifically
-      including the test status and the exact raw output string as obtained from the
-      parent node.
-    description: Generate a thorough human-readable summary of the test execution,
-      accurately incorporating the test status, raw output string, and any additional
-      relevant details.
+    prompt: Generate a concise paragraph that includes the test status and the exact
+      raw output string from the previous step. The summary should clearly state whether
+      the test passed or failed and provide the output content.
+    description: Create a human‑readable summary of the test outcome.
     agent: false
