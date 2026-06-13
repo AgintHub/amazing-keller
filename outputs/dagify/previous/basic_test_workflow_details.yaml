@@ -29,22 +29,23 @@ nodes:
     nodes_depended_on:
     - execute_test
     nodes_dependent_on: []
-    prompt: Inspect `raw_output` for the `TEST_PASSED` substring to determine the
-      test status (PASS or FAIL). Construct a JSON object with fields `test_status`
-      and `raw_output` based on the inspection result.
+    prompt: Inspect `raw_output` from the test command for the `TEST_PASSED` substring
+      to determine the test status (PASS or FAIL), and construct a JSON object with
+      fields `test_status` and `raw_output` based on the inspection result.
     description: Thoroughly examine the `raw_output` from the test command, confirming
-      that it clearly indicates test success (`TEST_PASSED` present) or failure, and
-      accurately report the result in a JSON object containing fields `test_status`
-      and `raw_output`.
+      that it clearly indicates test success (`TEST_PASSED` present) and accurately
+      reports the result in a JSON object containing fields `test_status` and `raw_output`,
+      as informed by the `execute_test` node.
     agent: false
   summarize_test_results:
     name: summarize_test_results
     nodes_depended_on:
     - collect_test_output
     nodes_dependent_on: []
-    prompt: Produce a clear, concise paragraph summarizing the test result, specifying
-      the `test_status` and including the exact `raw_output` string. Return the summary
-      as `final_report`.
-    description: Generate a detailed human-readable summary of the test execution,
-      incorporating the `test_status` and exact `raw_output` string.
+    prompt: Produce a clear, detailed paragraph summarizing the test result, specifically
+      including the test status and the exact raw output string as obtained from the
+      parent node.
+    description: Generate a thorough human-readable summary of the test execution,
+      accurately incorporating the test status, raw output string, and any additional
+      relevant details.
     agent: false
