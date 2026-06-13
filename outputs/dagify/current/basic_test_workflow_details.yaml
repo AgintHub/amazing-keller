@@ -1,4 +1,4 @@
-dag_type: stub
+dag_type: shim
 description: Generated workflow from UI.
 name: basic_test_workflow
 nodes:
@@ -9,25 +9,27 @@ nodes:
       presence.
     implementation: "from pydantic import BaseModel, Field\n\n\nclass ExecuteTestOutput(BaseModel):\n\
       \    \"\"\"Pydantic model for execute_test node outputs.\"\"\"\n    raw_output:\
-      \ str = (\n        Field(..., description=\"The command\\u2019s standard output,\
-      \ including any trailing newline.\")\n    )\n    passed: bool = (\n        Field(...,\
-      \ description=\"Whether the output matched the expectation.\")\n    )\n\n\n\
-      class CollectTestOutputOutput(BaseModel):\n    \"\"\"Pydantic model for collect_test_output\
-      \ node outputs.\"\"\"\n    test_status: str = (\n        Field(..., description=\"\
-      Literal string indicating the test status, either \\\"PASSED\\\" or \\\"FAILED\\\
-      \"\")\n    )\n    raw_output: str = (\n        Field(..., description=\"Original\
-      \ captured output string, preserved exactly as received\")\n    )\n\n\ndef collect_test_output(execute_test_input:\
-      \ ExecuteTestOutput, **kwargs) -> CollectTestOutputOutput:\n    \"\"\"\n   \
-      \ Collects test output and sets test status.\n\n    Parameters\n    ----------\n\
-      \    raw_output : str\n        String supplied by the execute_test node.\n\n\
-      \    Returns\n    -------\n    dict\n        Dictionary with test_status and\
-      \ raw_output matching the declared\n        output_structure.\n\n    Raises\n\
-      \    ------\n    ValueError\n        If the input string is empty or contains\
-      \ only whitespace.\n\n    Examples\n    --------\n    >>> parse_test_output('TEST_PASSED\n\
-      Test Output')\n    {'test_status': 'PASSED', 'raw_output': 'TEST_PASSED\\nTest\
-      \ Output'}\n\n    >>> parse_test_output('Test Output')\n    {'test_status':\
-      \ 'FAILED', 'raw_output': 'Test Output'}\n\n    \"\"\"\n    return CollectTestOutputOutput(\n\
-      \        test_status=\"\",\n        raw_output=\"\",\n    )"
+      \ str = (\n        Field(..., description = (\n            \"The command\\u2019s\
+      \ standard output, including any trailing newline.\")\n        )\n    )\n  \
+      \  passed: bool = (\n        Field(..., description=\"Whether the output matched\
+      \ the expectation.\")\n    )\n\n\nclass CollectTestOutputOutput(BaseModel):\n\
+      \    \"\"\"Pydantic model for collect_test_output node outputs.\"\"\"\n    test_status:\
+      \ str = (\n        Field(..., description = (\n            \"Literal string\
+      \ indicating the test status, either \"PASSED\" or \"FAILED\"\")\n        )\n\
+      \    )\n    raw_output: str = (\n        Field(..., description = (\n      \
+      \      \"Original captured output string, preserved exactly as received\")\n\
+      \        )\n    )\n\n\ndef collect_test_output(execute_test_input: ExecuteTestOutput,\
+      \ **kwargs) -> CollectTestOutputOutput:\n    \"\"\"\n    Collects test output\
+      \ and sets test status.\n\n    Parameters\n    ----------\n    raw_output :\
+      \ str\n        String supplied by the execute_test node.\n\n    Returns\n  \
+      \  -------\n    dict\n        Dictionary with test_status and raw_output matching\
+      \ the declared\n        output_structure.\n\n    Raises\n    ------\n    ValueError\n\
+      \        If the input string is empty or contains only whitespace.\n\n    Examples\n\
+      \    --------\n    >>> parse_test_output('TEST_PASSED\nTest Output')\n    {'test_status':\
+      \ 'PASSED', 'raw_output': 'TEST_PASSED\\nTest Output'}\n\n    >>> parse_test_output('Test\
+      \ Output')\n    {'test_status': 'FAILED', 'raw_output': 'Test Output'}\n\n \
+      \   \"\"\"\n    return CollectTestOutputOutput(\n        test_status=\"\",\n\
+      \        raw_output=\"\",\n    )"
     name: collect_test_output
     nodes_depended_on:
     - execute_test
@@ -89,22 +91,24 @@ nodes:
       it against the predefined expected string.
     implementation: "from pydantic import BaseModel, Field\n\n\nclass PrepareTestEnvironmentOutput(BaseModel):\n\
       \    \"\"\"Pydantic model for prepare_test_environment node outputs.\"\"\"\n\
-      \    env_dir: str = (\n        Field(..., description=\"Absolute path of the\
-      \ isolated temporary directory\")\n    )\n    utils_ok: bool = (\n        Field(...,\
-      \ description=\"Whether the essential system utilities are verified and available\"\
-      )\n    )\n    permissions_ok: bool = (\n        Field(..., description=\"Whether\
-      \ the new directory has mode `0700` and is isolated\")\n    )\n    symlinks_ok:\
+      \    env_dir: str = (\n        Field(..., description = (\n            \"Absolute\
+      \ path of the isolated temporary directory\")\n        )\n    )\n    utils_ok:\
+      \ bool = (\n        Field(..., description = (\n            \"Whether the essential\
+      \ system utilities are verified and available\")\n        )\n    )\n    permissions_ok:\
+      \ bool = (\n        Field(..., description = (\n            \"Whether the new\
+      \ directory has mode `0700` and is isolated\")\n        )\n    )\n    symlinks_ok:\
       \ bool = (\n        Field(..., description=\"Whether the new directory contains\
-      \ no symlinks\")\n    )\n    cleanup_command: str = (\n        Field(..., description=\"\
-      Shell command to safely remove the directory after tests complete\")\n    )\n\
-      \    summary: str = (\n        Field(..., description=\"Summary of the environment\
-      \ setup, including success/failure status for each check and relevant environment\
-      \ variables\")\n    )\n\n\nclass ExecuteTestOutput(BaseModel):\n    \"\"\"Pydantic\
-      \ model for execute_test node outputs.\"\"\"\n    raw_output: str = (\n    \
-      \    Field(..., description=\"The command\\u2019s standard output, including\
-      \ any trailing newline.\")\n    )\n    passed: bool = (\n        Field(...,\
-      \ description=\"Whether the output matched the expectation.\")\n    )\n\n\n\
-      def execute_test(prepare_test_environment_input: PrepareTestEnvironmentOutput,\
+      \ no symlinks\")\n    )\n    cleanup_command: str = (\n        Field(..., description\
+      \ = (\n            \"Shell command to safely remove the directory after tests\
+      \ complete\")\n        )\n    )\n    summary: str = (\n        Field(..., description\
+      \ = (\n            \"Summary of the environment setup, including success/failure\
+      \ status for each check and relevant environment variables\")\n        )\n \
+      \   )\n\n\nclass ExecuteTestOutput(BaseModel):\n    \"\"\"Pydantic model for\
+      \ execute_test node outputs.\"\"\"\n    raw_output: str = (\n        Field(...,\
+      \ description = (\n            \"The command\\u2019s standard output, including\
+      \ any trailing newline.\")\n        )\n    )\n    passed: bool = (\n       \
+      \ Field(..., description=\"Whether the output matched the expectation.\")\n\
+      \    )\n\n\ndef execute_test(prepare_test_environment_input: PrepareTestEnvironmentOutput,\
       \ **kwargs) -> ExecuteTestOutput:\n    \"\"\"\n    Run a deterministic echo\
       \ command and validate its output.\n\n    Parameters\n    ----------\n    env_dir\
       \ : str\n        AbsolutePath to the isolated test environment directory.\n\
@@ -158,39 +162,64 @@ nodes:
     shims: []
   prepare_test_environment:
     agent: false
-    code_node_type: stub
+    code_node_type: shim
     description: Creates an isolated temporary directory for testing, verifies that
       essential system utilities are available, and records all necessary information
       to enable safe cleanup. Returns a JSON object with fields `env_dir`, `utils_ok`,
       `permissions_ok`, `symlinks_ok`, `cleanup_command`, and a summary of the environment
       setup.
-    implementation: "from pydantic import BaseModel, Field\n\n\nclass PrepareTestEnvironmentOutput(BaseModel):\n\
-      \    \"\"\"Pydantic model for prepare_test_environment node outputs.\"\"\"\n\
-      \    env_dir: str = (\n        Field(..., description=\"Absolute path of the\
-      \ isolated temporary directory\")\n    )\n    utils_ok: bool = (\n        Field(...,\
-      \ description=\"Whether the essential system utilities are verified and available\"\
-      )\n    )\n    permissions_ok: bool = (\n        Field(..., description=\"Whether\
-      \ the new directory has mode `0700` and is isolated\")\n    )\n    symlinks_ok:\
-      \ bool = (\n        Field(..., description=\"Whether the new directory contains\
-      \ no symlinks\")\n    )\n    cleanup_command: str = (\n        Field(..., description=\"\
-      Shell command to safely remove the directory after tests complete\")\n    )\n\
-      \    summary: str = (\n        Field(..., description=\"Summary of the environment\
-      \ setup, including success/failure status for each check and relevant environment\
-      \ variables\")\n    )\n\n\ndef prepare_test_environment(general_input: str,\
-      \ **kwargs) -> PrepareTestEnvironmentOutput:\n    \"\"\"\n    Setup isolated\
-      \ temporary directory and verify utilities for testing.\n\n    Parameters\n\
-      \    ----------\n    current_working_directory : str\n        The current working\
-      \ directory where the temporary directory will be\n        created.\n\n    Returns\n\
-      \    -------\n    dict\n        Dictionary containing the declared output fields.\n\
-      \n    Raises\n    ------\n    ValueError\n        If an input is invalid or\
-      \ cannot be resolved.\n\n    Examples\n    --------\n    >>> import os\n   \
-      \ >>> import tempfile\n    >>> import which\n    >>> import pwd\n    >>> import\
-      \ grp\n    >>> import stat\n    {'env_dir': '/tmp/test_env.XXXXXX', 'utils_ok':\
-      \ True, 'permissions_ok':\n    True, 'symlinks_ok': True, 'cleanup_command':\
-      \ 'rm -rf /tmp/test_env.XXXXXX',\n    'summary': 'Environment setup successful.'}\n\
-      \n    \"\"\"\n    return PrepareTestEnvironmentOutput(\n        env_dir=\"\"\
-      ,\n        utils_ok=False,\n        permissions_ok=False,\n        symlinks_ok=False,\n\
-      \        cleanup_command=\"\",\n        summary=\"\",\n    )"
+    implementation: "from ._prepare_test_environment.create_unique_temp_directory\
+      \ import create_unique_temp_directory\nfrom ._prepare_test_environment.get_absolute_path\
+      \ import get_absolute_path\nfrom ._prepare_test_environment.verify_utility_availability\
+      \ import verify_utility_availability\nfrom ._prepare_test_environment.check_directory_permissions\
+      \ import check_directory_permissions\nfrom ._prepare_test_environment.verify_directory_isolation\
+      \ import verify_directory_isolation\nfrom ._prepare_test_environment.check_for_symlinks\
+      \ import check_for_symlinks\nfrom ._prepare_test_environment.get_relevant_environment_variables\
+      \ import get_relevant_environment_variables\nfrom ._prepare_test_environment.generate_environment_summary\
+      \ import generate_environment_summary\n\nfrom pydantic import BaseModel, Field\n\
+      \n\nclass PrepareTestEnvironmentOutput(BaseModel):\n    \"\"\"Pydantic model\
+      \ for prepare_test_environment node outputs.\"\"\"\n    env_dir: str = (\n \
+      \       Field(..., description = (\n            \"Absolute path of the isolated\
+      \ temporary directory\")\n        )\n    )\n    utils_ok: bool = (\n       \
+      \ Field(..., description = (\n            \"Whether the essential system utilities\
+      \ are verified and available\")\n        )\n    )\n    permissions_ok: bool\
+      \ = (\n        Field(..., description = (\n            \"Whether the new directory\
+      \ has mode `0700` and is isolated\")\n        )\n    )\n    symlinks_ok: bool\
+      \ = (\n        Field(..., description=\"Whether the new directory contains no\
+      \ symlinks\")\n    )\n    cleanup_command: str = (\n        Field(..., description\
+      \ = (\n            \"Shell command to safely remove the directory after tests\
+      \ complete\")\n        )\n    )\n    summary: str = (\n        Field(..., description\
+      \ = (\n            \"Summary of the environment setup, including success/failure\
+      \ status for each check and relevant environment variables\")\n        )\n \
+      \   )\n\n\ndef prepare_test_environment(general_input: str, **kwargs) -> PrepareTestEnvironmentOutput:\n\
+      \    \"\"\"\n    Setup isolated temporary directory and verify utilities for\
+      \ testing.\n\n    Parameters\n    ----------\n    current_working_directory\
+      \ : str\n        The current working directory where the temporary directory\
+      \ will be\n        created.\n\n    Returns\n    -------\n    dict\n        Dictionary\
+      \ containing the declared output fields.\n\n    Raises\n    ------\n    ValueError\n\
+      \        If an input is invalid or cannot be resolved.\n\n    Examples\n   \
+      \ --------\n    >>> import os\n    >>> import tempfile\n    >>> import which\n\
+      \    >>> import pwd\n    >>> import grp\n    >>> import stat\n    {'env_dir':\
+      \ '/tmp/test_env.XXXXXX', 'utils_ok': True, 'permissions_ok':\n    True, 'symlinks_ok':\
+      \ True, 'cleanup_command': 'rm -rf /tmp/test_env.XXXXXX',\n    'summary': 'Environment\
+      \ setup successful.'}\n\n    \"\"\"\n    temp_dir_path: str = create_unique_temp_directory()\n\
+      \    env_dir_absolute: str = get_absolute_path(path=temp_dir_path)\n    \n \
+      \   echo_path: str = verify_utility_availability(utility=\"echo\")\n    ls_path:\
+      \ str = verify_utility_availability(utility=\"ls\")\n    mkdir_path: str = verify_utility_availability(utility=\"\
+      mkdir\")\n    utils_available: bool = bool(echo_path and ls_path and mkdir_path)\n\
+      \    \n    directory_mode: str = check_directory_permissions(directory=env_dir_absolute)\n\
+      \    is_isolated: bool = verify_directory_isolation(directory=env_dir_absolute)\n\
+      \    permissions_valid: bool = directory_mode == \"0700\" and is_isolated\n\
+      \    \n    has_symlinks: bool = check_for_symlinks(directory=env_dir_absolute)\n\
+      \    symlinks_valid: bool = not has_symlinks\n    \n    cleanup_cmd: str = f\"\
+      rm -rf \\\"{env_dir_absolute}\\\"\"\n    \n    environment_vars: dict = get_relevant_environment_variables()\n\
+      \    setup_summary: str = generate_environment_summary(\n        env_dir=env_dir_absolute,\n\
+      \        utils_ok=utils_available,\n        permissions_ok=permissions_valid,\n\
+      \        symlinks_ok=symlinks_valid,\n        env_vars=environment_vars\n  \
+      \  )\n    \n    return PrepareTestEnvironmentOutput(\n        env_dir=env_dir_absolute,\n\
+      \        utils_ok=utils_available,\n        permissions_ok=permissions_valid,\n\
+      \        symlinks_ok=symlinks_valid,\n        cleanup_command=cleanup_cmd,\n\
+      \        summary=setup_summary\n    )"
     name: prepare_test_environment
     nodes_depended_on: []
     nodes_dependent_on: []
@@ -264,23 +293,497 @@ nodes:
       6. Return a structured summary of the environment setup, including success/failure
       status for each check, any relevant environment variables (e.g., `PATH`), and
       a cleanup command.'
-    shims: []
+    shims:
+    - agent: false
+      code_node_type: virtual-stub
+      description: Creates a typed node for generating a unique temporary directory
+      implementation: "def create_unique_temp_directory() -> str:\n    \"\"\"\n  \
+        \  Creates a unique temporary directory\n\n    Parameters\n    ----------\n\
+        \    input_params : dict\n        Input parameters for the shim\n\n    Returns\n\
+        \    -------\n    str\n        The path to the created unique temporary directory\n\
+        \n    Raises\n    ------\n    ValueError\n        When input validation fails\n\
+        \    TypeError\n        When input types are incorrect\n\n    Examples\n \
+        \   --------\n    >>> temp_dir_path = create_unique_temp_directory()\n   \
+        \ Absolute path of a unique temporary directory\n\n    >>> temp_dir_path =\
+        \ create_unique_temp_directory(input_params={'foo':\n    'bar'})\n    Absolute\
+        \ path of a unique temporary directory with 'bar'\n\n    \"\"\"\n    raise\
+        \ NotImplementedError(\"This is a virtual stub node that needs to be implemented\"\
+        )"
+      name: create_unique_temp_directory
+      nodes_depended_on: []
+      nodes_dependent_on: []
+      output_structure:
+      - description: Output of type str
+        key: output
+        type: str
+      prd:
+        conceptual_info: This shim node creates a unique temporary directory for preparation
+          of the test environment.
+        docstring:
+          examples:
+          - lines:
+            - temp_dir_path = create_unique_temp_directory()
+            output: Absolute path of a unique temporary directory
+          - lines:
+            - 'temp_dir_path = create_unique_temp_directory(input_params={''foo'':
+              ''bar''})'
+            output: Absolute path of a unique temporary directory with 'bar'
+          parameters:
+          - description: Input parameters for the shim
+            name: input_params
+            type: dict
+          raises:
+          - description: When input validation fails
+            type: ValueError
+          - description: When input types are incorrect
+            type: TypeError
+          returns:
+            description: The path to the created unique temporary directory
+            type: str
+          summary: Creates a unique temporary directory
+      prompt: Typed node for shim create_unique_temp_directory
+      selected_tools: []
+      shims: []
+    - agent: false
+      code_node_type: virtual-stub
+      description: Retrieve the absolute path of a given directory or file.
+      implementation: "def get_absolute_path(path: str) -> str:\n    \"\"\"\n    Obtain\
+        \ the absolute path of a directory or file.\n\n    Parameters\n    ----------\n\
+        \    path : str\n        The path for which the absolute path is to be retrieved.\n\
+        \n    Returns\n    -------\n    STR\n        The absolute path of the directory\
+        \ or file.\n\n    Raises\n    ------\n    ValueError\n        When the input\
+        \ path does not exist or is invalid.\n    TypeError\n        When the input\
+        \ path is not a string.\n\n    Examples\n    --------\n    >>> get_absolute_path('/home/user')\n\
+        \    /home/user\n\n    >>> get_absolute_path('./current_directory')\n    /current_directory\n\
+        \n    \"\"\"\n    raise NotImplementedError(\"This is a virtual stub node\
+        \ that needs to be implemented\")"
+      name: get_absolute_path
+      nodes_depended_on: []
+      nodes_dependent_on: []
+      output_structure:
+      - description: Output of type str
+        key: output
+        type: str
+      - description: Input parameter of type str
+        key: path
+        type: str
+      prd:
+        conceptual_info: A shim responsible for obtaining the absolute path of a given
+          directory or file.
+        docstring:
+          examples:
+          - lines:
+            - get_absolute_path('/home/user')
+            output: /home/user
+          - lines:
+            - get_absolute_path('./current_directory')
+            output: /current_directory
+          parameters:
+          - description: The path for which the absolute path is to be retrieved.
+            name: path
+            type: str
+          raises:
+          - description: When the input path does not exist or is invalid.
+            type: ValueError
+          - description: When the input path is not a string.
+            type: TypeError
+          returns:
+            description: The absolute path of the directory or file.
+            type: STR
+          summary: Obtain the absolute path of a directory or file.
+      prompt: Provide the absolute path for a directory or file.
+      selected_tools: []
+      shims: []
+    - agent: false
+      code_node_type: virtual-stub
+      description: Verifies the availability of a utility on the system by checking
+        its absolute path.
+      implementation: "def verify_utility_availability(utility: str) -> str:\n   \
+        \ \"\"\"\n    Verifies a system utility by checking its existence at a specific\
+        \ path.\n\n    Parameters\n    ----------\n    utility : str\n        The\
+        \ name of the utility to verify (e.g., `echo`, `ls`, `mkdir`).\n\n    Returns\n\
+        \    -------\n    dict\n        A dictionary containing the utility name and\
+        \ its absolute path if\n        found, otherwise `None` for the utility.\n\
+        \n    Raises\n    ------\n    ValueError\n        When the utility is not\
+        \ found or an error occurs while checking its\n        presence.\n    TypeError\n\
+        \        When the input type is incorrect or the utility name is invalid.\n\
+        \n    Examples\n    --------\n    >>> verify_utility_availability(utility='echo')\n\
+        \    >>> verify_utility_availability(utility='non-existent-utility')\n   \
+        \ {'output': '/bin/echo', 'utility': 'echo'}\n    None\n\n    \"\"\"\n   \
+        \ raise NotImplementedError(\"This is a virtual stub node that needs to be\
+        \ implemented\")"
+      name: verify_utility_availability
+      nodes_depended_on: []
+      nodes_dependent_on: []
+      output_structure:
+      - description: Output of type str
+        key: output
+        type: str
+      - description: Input parameter of type str
+        key: utility
+        type: str
+      prd:
+        conceptual_info: The shim verifies the presence of a system utility by checking
+          its absolute path.
+        docstring:
+          examples:
+          - lines:
+            - verify_utility_availability(utility='echo')
+            - verify_utility_availability(utility='non-existent-utility')
+            output: '{''output'': ''/bin/echo'', ''utility'': ''echo''}
+
+              None'
+          parameters:
+          - description: The name of the utility to verify (e.g., `echo`, `ls`, `mkdir`).
+            name: utility
+            type: str
+          raises:
+          - description: When the utility is not found or an error occurs while checking
+              its presence.
+            type: ValueError
+          - description: When the input type is incorrect or the utility name is invalid.
+            type: TypeError
+          returns:
+            description: A dictionary containing the utility name and its absolute
+              path if found, otherwise `None` for the utility.
+            type: dict
+          summary: Verifies a system utility by checking its existence at a specific
+            path.
+      prompt: Verify utility availability on this system
+      selected_tools: []
+      shims: []
+    - agent: false
+      code_node_type: virtual-stub
+      description: Verifies the mode of a given directory and returns its mode as
+        a string.
+      implementation: "def check_directory_permissions(directory: str) -> str:\n \
+        \   \"\"\"\n    Checks the directory permissions of a given directory.\n\n\
+        \    Parameters\n    ----------\n    directory : str\n        Path to the\
+        \ directory to check.\n\n    Returns\n    -------\n    str\n        Mode of\
+        \ the directory as a string.\n\n    Raises\n    ------\n    ValueError\n \
+        \       When the directory path is invalid.\n    TypeError\n        When the\
+        \ input type is incorrect.\n\n    Examples\n    --------\n    >>> check_directory_permissions('/path/to/directory')\n\
+        \    '0700'\n\n    >>> check_directory_permissions('/another/directory')\n\
+        \    'another_mode'\n\n    \"\"\"\n    raise NotImplementedError(\"This is\
+        \ a virtual stub node that needs to be implemented\")"
+      name: check_directory_permissions
+      nodes_depended_on: []
+      nodes_dependent_on: []
+      output_structure:
+      - description: Output of type str
+        key: output
+        type: str
+      - description: Input parameter of type str
+        key: directory
+        type: str
+      prd:
+        conceptual_info: The shim `check_directory_permissions` is used to validate
+          directory permissions and provide its mode as a string.
+        docstring:
+          examples:
+          - lines:
+            - check_directory_permissions('/path/to/directory')
+            output: '''0700'''
+          - lines:
+            - check_directory_permissions('/another/directory')
+            output: '''another_mode'''
+          parameters:
+          - description: Path to the directory to check.
+            name: directory
+            type: str
+          raises:
+          - description: When the directory path is invalid.
+            type: ValueError
+          - description: When the input type is incorrect.
+            type: TypeError
+          returns:
+            description: Mode of the directory as a string.
+            type: str
+          summary: Checks the directory permissions of a given directory.
+      prompt: Check if a directory has the correct mode
+      selected_tools: []
+      shims: []
+    - agent: false
+      code_node_type: virtual-stub
+      description: Verifies whether the directory is properly isolated to prevent
+        unauthorized access.
+      implementation: "def verify_directory_isolation(directory: str) -> bool:\n \
+        \   \"\"\"\n    Verifies whether a directory is properly isolated to prevent\
+        \ unauthorized\n    access.\n\n    Parameters\n    ----------\n    directory\
+        \ : STR\n        Path to the directory being checked for isolation.\n\n  \
+        \  Returns\n    -------\n    dict\n        A dictionary containing a boolean\
+        \ indicating whether the isolated\n        directory is accessible only by\
+        \ the owner, and the directory path\n        being checked.\n\n    Raises\n\
+        \    ------\n    ValueError\n        Raised when the input directory path\
+        \ is invalid or the directory\n        does not exist.\n    PermissionError\n\
+        \        Raised when the shim lacks permission to access the directory being\n\
+        \        checked for isolation.\n\n    Examples\n    --------\n    >>> print(verify_directory_isolation('/home/user/isolated_dir'))\n\
+        \    >>> print(verify_directory_isolation('/home/user/public_dir'))\n    {'output':\
+        \ True, 'directory': '/home/user/isolated_dir'}\n    {'output': False, 'directory':\
+        \ '/home/user/public_dir'}\n\n    \"\"\"\n    raise NotImplementedError(\"\
+        This is a virtual stub node that needs to be implemented\")"
+      name: verify_directory_isolation
+      nodes_depended_on: []
+      nodes_dependent_on: []
+      output_structure:
+      - description: Output of type bool
+        key: output
+        type: bool
+      - description: Input parameter of type str
+        key: directory
+        type: str
+      prd:
+        conceptual_info: This shim verifies directory isolation to ensure the directory
+          is accessible only by its owner.
+        docstring:
+          examples:
+          - lines:
+            - print(verify_directory_isolation('/home/user/isolated_dir'))
+            - print(verify_directory_isolation('/home/user/public_dir'))
+            output: '{''output'': True, ''directory'': ''/home/user/isolated_dir''}
+
+              {''output'': False, ''directory'': ''/home/user/public_dir''}'
+          parameters:
+          - description: Path to the directory being checked for isolation.
+            name: directory
+            type: STR
+          raises:
+          - description: Raised when the input directory path is invalid or the directory
+              does not exist.
+            type: ValueError
+          - description: Raised when the shim lacks permission to access the directory
+              being checked for isolation.
+            type: PermissionError
+          returns:
+            description: A dictionary containing a boolean indicating whether the
+              isolated directory is accessible only by the owner, and the directory
+              path being checked.
+            type: dict
+          summary: Verifies whether a directory is properly isolated to prevent unauthorized
+            access.
+      prompt: 'Confirm directory isolation: Is the isolated directory accessible only
+        by the owner?'
+      selected_tools: []
+      shims: []
+    - agent: false
+      code_node_type: virtual-stub
+      description: Checks if a directory contains symlinks.
+      implementation: "def check_for_symlinks(directory: str) -> bool:\n    \"\"\"\
+        \n    Checks if a directory contains symlinks.\n\n    Parameters\n    ----------\n\
+        \    directory : STR\n        The absolute path of the directory to check\
+        \ for symlinks.\n\n    Returns\n    -------\n    dict\n        A dictionary\
+        \ containing the output and directory, where output is a\n        boolean\
+        \ indicating the presence of symlinks and directory is the\n        input\
+        \ path.\n\n    Raises\n    ------\n    ValueError\n        Raised when the\
+        \ input directory path is invalid or not a string.\n    TypeError\n      \
+        \  Raised when the input directory path is not a string.\n\n    Examples\n\
+        \    --------\n    >>> check_for_symlinks(directory='/path/to/valid/directory')\n\
+        \    {'output': False, 'directory': '/path/to/valid/directory'}\n\n    >>>\
+        \ check_for_symlinks(directory='/path/to/directory/with/symlinks')\n    {'output':\
+        \ True, 'directory': '/path/to/directory/with/symlinks'}\n\n    \"\"\"\n \
+        \   raise NotImplementedError(\"This is a virtual stub node that needs to\
+        \ be implemented\")"
+      name: check_for_symlinks
+      nodes_depended_on: []
+      nodes_dependent_on: []
+      output_structure:
+      - description: Output of type bool
+        key: output
+        type: bool
+      - description: Input parameter of type str
+        key: directory
+        type: str
+      prd:
+        conceptual_info: This shim checks whether a given directory contains symlinks,
+          enabling comprehensive preparation of isolated environments for testing
+          and development purposes.
+        docstring:
+          examples:
+          - lines:
+            - check_for_symlinks(directory='/path/to/valid/directory')
+            output: '{''output'': False, ''directory'': ''/path/to/valid/directory''}'
+          - lines:
+            - check_for_symlinks(directory='/path/to/directory/with/symlinks')
+            output: '{''output'': True, ''directory'': ''/path/to/directory/with/symlinks''}'
+          parameters:
+          - description: The absolute path of the directory to check for symlinks.
+            name: directory
+            type: STR
+          raises:
+          - description: Raised when the input directory path is invalid or not a
+              string.
+            type: ValueError
+          - description: Raised when the input directory path is not a string.
+            type: TypeError
+          returns:
+            description: A dictionary containing the output and directory, where output
+              is a boolean indicating the presence of symlinks and directory is the
+              input path.
+            type: dict
+          summary: Checks if a directory contains symlinks.
+      prompt: Check for symlinks in a directory.
+      selected_tools: []
+      shims: []
+    - agent: false
+      code_node_type: virtual-stub
+      description: Returns a dictionary of relevant environment variables used in
+        the prepare test environment node.
+      implementation: "def get_relevant_environment_variables() -> str:\n    \"\"\"\
+        \n    Extracts relevant environment variables used in the prepare test environment\n\
+        \    node.\n\n    Parameters\n    ----------\n    input_param : str\n    \
+        \    Not applicable, as this is a shim.\n\n    Returns\n    -------\n    str\n\
+        \        A dictionary of relevant environment variables used in the prepare\n\
+        \        test environment node. It should be in the format of 'key-value'\n\
+        \        pairs, where keys are variable names and values are the\n       \
+        \ corresponding values.\n\n    Raises\n    ------\n    TypeError\n       \
+        \ If input is not a string or if the input string is malformed.\n\n    Examples\n\
+        \    --------\n    >>> environment_vars = get_relevant_environment_variables()\n\
+        \    '{key1: value1, key2: value2}'\n\n    \"\"\"\n    raise NotImplementedError(\"\
+        This is a virtual stub node that needs to be implemented\")"
+      name: get_relevant_environment_variables
+      nodes_depended_on: []
+      nodes_dependent_on: []
+      output_structure:
+      - description: Output of type dict
+        key: output
+        type: str
+      prd:
+        conceptual_info: This shim is a typed node for extracting relevant environment
+          variables used in the prepare test environment node.
+        docstring:
+          examples:
+          - lines:
+            - environment_vars = get_relevant_environment_variables()
+            output: '''{key1: value1, key2: value2}'''
+          parameters:
+          - description: Not applicable, as this is a shim.
+            name: input_param
+            type: str
+          raises:
+          - description: If input is not a string or if the input string is malformed.
+            type: TypeError
+          returns:
+            description: A dictionary of relevant environment variables used in the
+              prepare test environment node. It should be in the format of 'key-value'
+              pairs, where keys are variable names and values are the corresponding
+              values.
+            type: str
+          summary: Extracts relevant environment variables used in the prepare test
+            environment node.
+      prompt: 'Prompt for the get_relevant_environment_variables shim. (Default: None)'
+      selected_tools: []
+      shims: []
+    - agent: false
+      code_node_type: virtual-stub
+      description: Generates a summary of the environment setup, including success/failure
+        status for each check and relevant environment variables.
+      implementation: "def generate_environment_summary(env_dir: str, utils_ok: str,\
+        \ permissions_ok: str, symlinks_ok: str, env_vars: str) -> str:\n    \"\"\"\
+        \n    Generates a summary of the environment setup.\n\n    Parameters\n  \
+        \  ----------\n    env_dir : str\n        The absolute path of the isolated\
+        \ temporary directory.\n    utils_ok : str\n        Whether the essential\
+        \ system utilities are verified and available.\n    permissions_ok : str\n\
+        \        Whether the new directory has mode `0700` and is isolated.\n    symlinks_ok\
+        \ : str\n        Whether the new directory contains no symlinks.\n    env_vars\
+        \ : str\n        Relevant environment variables.\n\n    Returns\n    -------\n\
+        \    str\n        A string containing the environment summary, including\n\
+        \        success/failure status for each check and relevant environment\n\
+        \        variables.\n\n    Raises\n    ------\n    ValueError\n        When\
+        \ the input parameters do not match the expected format.\n    TypeError\n\
+        \        When the input parameters are of the wrong type.\n\n    Examples\n\
+        \    --------\n    >>> env_dir_absolute = get_absolute_path(temp_dir_path)\n\
+        \    >>> utils_available = verify_utility_availability('echo')\n    >>> permissions_valid\
+        \ =\n    check_directory_permissions(directory=env_dir_absolute)\n    >>>\
+        \ symlinks_valid = not has_symlinks\n    >>> environment_vars = get_relevant_environment_variables()\n\
+        \    >>> generate_environment_summary(env_dir=env_dir_absolute, \"\n    \"\
+        utils_ok=bool(utils_available), permissions_ok=permissions_valid, \"\n   \
+        \ \"symlinks_ok=symlinks_valid, env_vars=environment_vars)\n    A string containing\
+        \ the environment summary.\n\n    \"\"\"\n    raise NotImplementedError(\"\
+        This is a virtual stub node that needs to be implemented\")"
+      name: generate_environment_summary
+      nodes_depended_on: []
+      nodes_dependent_on: []
+      output_structure:
+      - description: Output of type str
+        key: output
+        type: str
+      - description: Input parameter of type str
+        key: env_dir
+        type: str
+      - description: Input parameter of type str
+        key: utils_ok
+        type: str
+      - description: Input parameter of type str
+        key: permissions_ok
+        type: str
+      - description: Input parameter of type str
+        key: symlinks_ok
+        type: str
+      - description: Input parameter of type str
+        key: env_vars
+        type: str
+      prd:
+        conceptual_info: This shim generates a summary of the environment setup, including
+          success/failure status for each check and relevant environment variables.
+        docstring:
+          examples:
+          - lines:
+            - env_dir_absolute = get_absolute_path(temp_dir_path)
+            - utils_available = verify_utility_availability('echo')
+            - permissions_valid = check_directory_permissions(directory=env_dir_absolute)
+            - symlinks_valid = not has_symlinks
+            - environment_vars = get_relevant_environment_variables()
+            - "generate_environment_summary(env_dir=env_dir_absolute, \"\n       \
+              \       \"utils_ok=bool(utils_available), permissions_ok=permissions_valid,\
+              \ \"\n              \"symlinks_ok=symlinks_valid, env_vars=environment_vars)"
+            output: A string containing the environment summary.
+          parameters:
+          - description: The absolute path of the isolated temporary directory.
+            name: env_dir
+            type: str
+          - description: Whether the essential system utilities are verified and available.
+            name: utils_ok
+            type: str
+          - description: Whether the new directory has mode `0700` and is isolated.
+            name: permissions_ok
+            type: str
+          - description: Whether the new directory contains no symlinks.
+            name: symlinks_ok
+            type: str
+          - description: Relevant environment variables.
+            name: env_vars
+            type: str
+          raises:
+          - description: When the input parameters do not match the expected format.
+            type: ValueError
+          - description: When the input parameters are of the wrong type.
+            type: TypeError
+          returns:
+            description: A string containing the environment summary, including success/failure
+              status for each check and relevant environment variables.
+            type: str
+          summary: Generates a summary of the environment setup.
+      prompt: Type `generate_environment_summary` and press Enter.
+      selected_tools: []
+      shims: []
   summarize_test_results:
     agent: false
-    code_node_type: stub
+    code_node_type: shim
     description: Creates a human-readable summary of test execution results, preserving
       formatting, by including the exact raw output wrapped in backticks.
-    implementation: "from pydantic import BaseModel, Field\n\n\nclass CollectTestOutputOutput(BaseModel):\n\
+    implementation: "from ._summarize_test_results.format_test_summary import format_test_summary\n\
+      \nfrom pydantic import BaseModel, Field\n\n\nclass CollectTestOutputOutput(BaseModel):\n\
       \    \"\"\"Pydantic model for collect_test_output node outputs.\"\"\"\n    test_status:\
-      \ str = (\n        Field(..., description=\"Literal string indicating the test\
-      \ status, either \\\"PASSED\\\" or \\\"FAILED\\\"\")\n    )\n    raw_output:\
-      \ str = (\n        Field(..., description=\"Original captured output string,\
-      \ preserved exactly as received\")\n    )\n\n\nclass SummarizeTestResultsOutput(BaseModel):\n\
-      \    \"\"\"Pydantic model for summarize_test_results node outputs.\"\"\"\n \
-      \   summary: str = (\n        Field(..., description=\"A single paragraph that\
-      \ states the test outcome, includes the exact raw output wrapped in backticks,\
-      \ and is formatted for clear, standalone logging or display.\")\n    )\n\n\n\
-      def summarize_test_results(collect_test_output_input: CollectTestOutputOutput,\
+      \ str = (\n        Field(..., description = (\n            \"Literal string\
+      \ indicating the test status, either \"PASSED\" or \"FAILED\"\")\n        )\n\
+      \    )\n    raw_output: str = (\n        Field(..., description = (\n      \
+      \      \"Original captured output string, preserved exactly as received\")\n\
+      \        )\n    )\n\n\nclass SummarizeTestResultsOutput(BaseModel):\n    \"\"\
+      \"Pydantic model for summarize_test_results node outputs.\"\"\"\n    summary:\
+      \ str = (\n        Field(..., description = (\n            \"A single paragraph\
+      \ that states the test outcome, includes the exact raw output wrapped in backticks,\
+      \ and is formatted for clear, standalone logging or display.\")\n        )\n\
+      \    )\n\n\ndef summarize_test_results(collect_test_output_input: CollectTestOutputOutput,\
       \ **kwargs) -> SummarizeTestResultsOutput:\n    \"\"\"\n    Generate a concise\
       \ summary of test execution results.\n\n    Parameters\n    ----------\n   \
       \ raw_output : str\n        Raw output string from the collect_test_output node,\
@@ -291,7 +794,10 @@ nodes:
       \ JSON string or test_status is neither\n        'PASSED' nor 'FAILED'.\n\n\
       \    Examples\n    --------\n    >>> summarize_test_results('TEST_PASSED\nThis\
       \ is a test report.')\n    Pass: 'TEST_PASSED\n    This is a test report.'\n\
-      \n    \"\"\"\n    return SummarizeTestResultsOutput(\n        summary=\"\",\n\
+      \n    \"\"\"\n    test_status = collect_test_output_input.test_status\n    raw_output\
+      \ = collect_test_output_input.raw_output\n    \n    formatted_summary: str =\
+      \ format_test_summary(\n        test_status=test_status,\n        raw_output=raw_output\n\
+      \    )\n    \n    return SummarizeTestResultsOutput(\n        summary=formatted_summary\n\
       \    )"
     name: summarize_test_results
     nodes_depended_on:
@@ -332,4 +838,74 @@ nodes:
     prompt: Generate a concise paragraph that includes the test status and the exact
       raw_output string from the previous step, clearly stating whether the test passed
       or failed using the keyword and enclosing the full raw_output value in backticks.
-    shims: []
+    shims:
+    - agent: false
+      code_node_type: virtual-stub
+      description: A typed node for generating a concise summary of test execution
+        results based on raw output and test status.
+      implementation: "def format_test_summary(test_status: str, raw_output: str)\
+        \ -> str:\n    \"\"\"\n    Generate a concise summary of test execution results.\n\
+        \n    Parameters\n    ----------\n    test_status : str\n        Literal string\
+        \ indicating the test status, either 'PASSED' or\n        'FAILED'.\n    raw_output\
+        \ : str\n        Raw output string from the collect_test_output node, including\
+        \ test\n        status and any output content.\n\n    Returns\n    -------\n\
+        \    str\n        Formatted summary of test execution results, including raw\
+        \ output\n        wrapped in backticks and test status.\n\n    Raises\n  \
+        \  ------\n    ValueError\n        When raw_output is not a valid JSON string\
+        \ or test_status is neither\n        'PASSED' nor 'FAILED'.\n\n    Examples\n\
+        \    --------\n    >>> formatted_summary = format_test_summary('PASSED', 'TEST_PASSED\\\
+        nThis is\n    a test report.')\n    >>> print(formatted_summary)\n    Pass:\
+        \ 'TEST_PASSED\\nThis is a test report.'\n\n    >>> formatted_summary = format_test_summary('FAILED',\
+        \ 'TEST_FAILED\\nThis is\n    a test report.')\n    >>> print(formatted_summary)\n\
+        \    Fail: 'TEST_FAILED\\nThis is a test report.'\n\n    \"\"\"\n    raise\
+        \ NotImplementedError(\"This is a virtual stub node that needs to be implemented\"\
+        )"
+      name: format_test_summary
+      nodes_depended_on: []
+      nodes_dependent_on: []
+      output_structure:
+      - description: Output of type str
+        key: output
+        type: str
+      - description: Input parameter of type str
+        key: test_status
+        type: str
+      - description: Input parameter of type str
+        key: raw_output
+        type: str
+      prd:
+        conceptual_info: The format_test_summary node generates a concise summary
+          of test execution results, including raw output and test status.
+        docstring:
+          examples:
+          - lines:
+            - formatted_summary = format_test_summary('PASSED', 'TEST_PASSED\nThis
+              is a test report.')
+            - print(formatted_summary)
+            output: 'Pass: ''TEST_PASSED\nThis is a test report.'''
+          - lines:
+            - formatted_summary = format_test_summary('FAILED', 'TEST_FAILED\nThis
+              is a test report.')
+            - print(formatted_summary)
+            output: 'Fail: ''TEST_FAILED\nThis is a test report.'''
+          parameters:
+          - description: Literal string indicating the test status, either 'PASSED'
+              or 'FAILED'.
+            name: test_status
+            type: str
+          - description: Raw output string from the collect_test_output node, including
+              test status and any output content.
+            name: raw_output
+            type: str
+          raises:
+          - description: When raw_output is not a valid JSON string or test_status
+              is neither 'PASSED' nor 'FAILED'.
+            type: ValueError
+          returns:
+            description: Formatted summary of test execution results, including raw
+              output wrapped in backticks and test status.
+            type: str
+          summary: Generate a concise summary of test execution results.
+      prompt: Generate a concise summary of test execution results
+      selected_tools: []
+      shims: []

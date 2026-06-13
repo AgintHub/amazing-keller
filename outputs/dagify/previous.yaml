@@ -1,11 +1,249 @@
-name: basic_test_workflow
-dag_type: spec
+dag_type: stub
 description: Generated workflow from UI.
+name: basic_test_workflow
 nodes:
+  collect_test_output:
+    agent: false
+    code_node_type: stub
+    description: Collects test output and sets test status based on 'TEST_PASSED'
+      presence.
+    implementation: "from pydantic import BaseModel, Field\n\n\nclass ExecuteTestOutput(BaseModel):\n\
+      \    \"\"\"Pydantic model for execute_test node outputs.\"\"\"\n    raw_output:\
+      \ str = (\n        Field(..., description=\"The command\\u2019s standard output,\
+      \ including any trailing newline.\")\n    )\n    passed: bool = (\n        Field(...,\
+      \ description=\"Whether the output matched the expectation.\")\n    )\n\n\n\
+      class CollectTestOutputOutput(BaseModel):\n    \"\"\"Pydantic model for collect_test_output\
+      \ node outputs.\"\"\"\n    test_status: str = (\n        Field(..., description=\"\
+      Literal string indicating the test status, either \\\"PASSED\\\" or \\\"FAILED\\\
+      \"\")\n    )\n    raw_output: str = (\n        Field(..., description=\"Original\
+      \ captured output string, preserved exactly as received\")\n    )\n\n\ndef collect_test_output(execute_test_input:\
+      \ ExecuteTestOutput, **kwargs) -> CollectTestOutputOutput:\n    \"\"\"\n   \
+      \ Collects test output and sets test status.\n\n    Parameters\n    ----------\n\
+      \    raw_output : str\n        String supplied by the execute_test node.\n\n\
+      \    Returns\n    -------\n    dict\n        Dictionary with test_status and\
+      \ raw_output matching the declared\n        output_structure.\n\n    Raises\n\
+      \    ------\n    ValueError\n        If the input string is empty or contains\
+      \ only whitespace.\n\n    Examples\n    --------\n    >>> parse_test_output('TEST_PASSED\n\
+      Test Output')\n    {'test_status': 'PASSED', 'raw_output': 'TEST_PASSED\\nTest\
+      \ Output'}\n\n    >>> parse_test_output('Test Output')\n    {'test_status':\
+      \ 'FAILED', 'raw_output': 'Test Output'}\n\n    \"\"\"\n    return CollectTestOutputOutput(\n\
+      \        test_status=\"\",\n        raw_output=\"\",\n    )"
+    name: collect_test_output
+    nodes_depended_on:
+    - execute_test
+    nodes_dependent_on: []
+    output_structure:
+    - description: Literal string indicating the test status, either "PASSED" or "FAILED"
+      key: test_status
+      type: str
+    - description: Original captured output string, preserved exactly as received
+      key: raw_output
+      type: str
+    prd:
+      conceptual_info: This node parses the test execution output from the execute_test
+        node and assigns a pass/fail status based on whether the 'TEST_PASSED' substring
+        is present. It returns a clean JSON object with test_status and raw_output
+        preserved from the original output.
+      docstring:
+        examples:
+        - lines:
+          - 'parse_test_output(''TEST_PASSED
+
+            Test Output'')'
+          output: '{''test_status'': ''PASSED'', ''raw_output'': ''TEST_PASSED\nTest
+            Output''}'
+        - lines:
+          - parse_test_output('Test Output')
+          output: '{''test_status'': ''FAILED'', ''raw_output'': ''Test Output''}'
+        parameters:
+        - description: String supplied by the execute_test node.
+          name: raw_output
+          type: str
+        raises:
+        - description: If the input string is empty or contains only whitespace.
+          type: ValueError
+        returns:
+          description: Dictionary with test_status and raw_output matching the declared
+            output_structure.
+          type: dict
+        summary: Collects test output and sets test status.
+    prompt: 'Read the `raw_output` string supplied by the `execute_test` node. Search
+      the string for the exact substring `TEST_PASSED`. If the substring is found,
+      set the field `test_status` to the string "PASSED"; otherwise set it to "FAILED".
+      Construct a JSON object with two keys:
+
+
+      - `test_status`: a literal string either "PASSED" or "FAILED".
+
+      - `raw_output`: the original captured output string, preserved exactly as received
+      (including all whitespace, line breaks, and any trailing newline).
+
+
+      Return this JSON object as the sole output of the node.'
+    shims: []
+  execute_test:
+    agent: false
+    code_node_type: stub
+    description: Runs a deterministic echo command inside the isolated test environment,
+      captures its exact standard output—including the trailing newline—and validates
+      it against the predefined expected string.
+    implementation: "from pydantic import BaseModel, Field\n\n\nclass PrepareTestEnvironmentOutput(BaseModel):\n\
+      \    \"\"\"Pydantic model for prepare_test_environment node outputs.\"\"\"\n\
+      \    env_dir: str = (\n        Field(..., description=\"Absolute path of the\
+      \ isolated temporary directory\")\n    )\n    utils_ok: bool = (\n        Field(...,\
+      \ description=\"Whether the essential system utilities are verified and available\"\
+      )\n    )\n    permissions_ok: bool = (\n        Field(..., description=\"Whether\
+      \ the new directory has mode `0700` and is isolated\")\n    )\n    symlinks_ok:\
+      \ bool = (\n        Field(..., description=\"Whether the new directory contains\
+      \ no symlinks\")\n    )\n    cleanup_command: str = (\n        Field(..., description=\"\
+      Shell command to safely remove the directory after tests complete\")\n    )\n\
+      \    summary: str = (\n        Field(..., description=\"Summary of the environment\
+      \ setup, including success/failure status for each check and relevant environment\
+      \ variables\")\n    )\n\n\nclass ExecuteTestOutput(BaseModel):\n    \"\"\"Pydantic\
+      \ model for execute_test node outputs.\"\"\"\n    raw_output: str = (\n    \
+      \    Field(..., description=\"The command\\u2019s standard output, including\
+      \ any trailing newline.\")\n    )\n    passed: bool = (\n        Field(...,\
+      \ description=\"Whether the output matched the expectation.\")\n    )\n\n\n\
+      def execute_test(prepare_test_environment_input: PrepareTestEnvironmentOutput,\
+      \ **kwargs) -> ExecuteTestOutput:\n    \"\"\"\n    Run a deterministic echo\
+      \ command and validate its output.\n\n    Parameters\n    ----------\n    env_dir\
+      \ : str\n        AbsolutePath to the isolated test environment directory.\n\
+      \    expected_string : str\n        Predefined expected string to be validated\
+      \ against the command’s\n        standard output.\n\n    Returns\n    -------\n\
+      \    dict\n        Dictionary containing the declared output fields: `raw_output`\
+      \ and\n        `passed`.\n\n    Raises\n    ------\n    ValueError\n       \
+      \ If the environment directory is unavailable or the expected string\n     \
+      \   is empty.\n\n    Examples\n    --------\n    >>> execute_test(env_dir='/test/env',\
+      \ expected_string='TEST_PASSED')\n    {'raw_output': 'TEST_PASSED\\n', 'passed':\
+      \ True}\n\n    \"\"\"\n    return ExecuteTestOutput(\n        raw_output=\"\"\
+      ,\n        passed=False,\n    )"
+    name: execute_test
+    nodes_depended_on:
+    - prepare_test_environment
+    nodes_dependent_on: []
+    output_structure:
+    - description: The command’s standard output, including any trailing newline.
+      key: raw_output
+      type: str
+    - description: Whether the output matched the expectation.
+      key: passed
+      type: bool
+    prd:
+      conceptual_info: Validate the exact output of a deterministic echo command inside
+        a prepared isolated environment against a predefined expected string.
+      docstring:
+        examples:
+        - lines:
+          - execute_test(env_dir='/test/env', expected_string='TEST_PASSED')
+          output: '{''raw_output'': ''TEST_PASSED\n'', ''passed'': True}'
+        parameters:
+        - description: AbsolutePath to the isolated test environment directory.
+          name: env_dir
+          type: str
+        - description: Predefined expected string to be validated against the command’s
+            standard output.
+          name: expected_string
+          type: str
+        raises:
+        - description: If the environment directory is unavailable or the expected
+            string is empty.
+          type: ValueError
+        returns:
+          description: 'Dictionary containing the declared output fields: `raw_output`
+            and `passed`.'
+          type: dict
+        summary: Run a deterministic echo command and validate its output.
+    prompt: 'Navigate to the test environment directory and execute the system echo
+      binary with the exact argument `TEST_PASSED`:'
+    shims: []
   prepare_test_environment:
+    agent: false
+    code_node_type: stub
+    description: Creates an isolated temporary directory for testing, verifies that
+      essential system utilities are available, and records all necessary information
+      to enable safe cleanup. Returns a JSON object with fields `env_dir`, `utils_ok`,
+      `permissions_ok`, `symlinks_ok`, `cleanup_command`, and a summary of the environment
+      setup.
+    implementation: "from pydantic import BaseModel, Field\n\n\nclass PrepareTestEnvironmentOutput(BaseModel):\n\
+      \    \"\"\"Pydantic model for prepare_test_environment node outputs.\"\"\"\n\
+      \    env_dir: str = (\n        Field(..., description=\"Absolute path of the\
+      \ isolated temporary directory\")\n    )\n    utils_ok: bool = (\n        Field(...,\
+      \ description=\"Whether the essential system utilities are verified and available\"\
+      )\n    )\n    permissions_ok: bool = (\n        Field(..., description=\"Whether\
+      \ the new directory has mode `0700` and is isolated\")\n    )\n    symlinks_ok:\
+      \ bool = (\n        Field(..., description=\"Whether the new directory contains\
+      \ no symlinks\")\n    )\n    cleanup_command: str = (\n        Field(..., description=\"\
+      Shell command to safely remove the directory after tests complete\")\n    )\n\
+      \    summary: str = (\n        Field(..., description=\"Summary of the environment\
+      \ setup, including success/failure status for each check and relevant environment\
+      \ variables\")\n    )\n\n\ndef prepare_test_environment(general_input: str,\
+      \ **kwargs) -> PrepareTestEnvironmentOutput:\n    \"\"\"\n    Setup isolated\
+      \ temporary directory and verify utilities for testing.\n\n    Parameters\n\
+      \    ----------\n    current_working_directory : str\n        The current working\
+      \ directory where the temporary directory will be\n        created.\n\n    Returns\n\
+      \    -------\n    dict\n        Dictionary containing the declared output fields.\n\
+      \n    Raises\n    ------\n    ValueError\n        If an input is invalid or\
+      \ cannot be resolved.\n\n    Examples\n    --------\n    >>> import os\n   \
+      \ >>> import tempfile\n    >>> import which\n    >>> import pwd\n    >>> import\
+      \ grp\n    >>> import stat\n    {'env_dir': '/tmp/test_env.XXXXXX', 'utils_ok':\
+      \ True, 'permissions_ok':\n    True, 'symlinks_ok': True, 'cleanup_command':\
+      \ 'rm -rf /tmp/test_env.XXXXXX',\n    'summary': 'Environment setup successful.'}\n\
+      \n    \"\"\"\n    return PrepareTestEnvironmentOutput(\n        env_dir=\"\"\
+      ,\n        utils_ok=False,\n        permissions_ok=False,\n        symlinks_ok=False,\n\
+      \        cleanup_command=\"\",\n        summary=\"\",\n    )"
     name: prepare_test_environment
     nodes_depended_on: []
     nodes_dependent_on: []
+    output_structure:
+    - description: Absolute path of the isolated temporary directory
+      key: env_dir
+      type: str
+    - description: Whether the essential system utilities are verified and available
+      key: utils_ok
+      type: bool
+    - description: Whether the new directory has mode `0700` and is isolated
+      key: permissions_ok
+      type: bool
+    - description: Whether the new directory contains no symlinks
+      key: symlinks_ok
+      type: bool
+    - description: Shell command to safely remove the directory after tests complete
+      key: cleanup_command
+      type: str
+    - description: Summary of the environment setup, including success/failure status
+        for each check and relevant environment variables
+      key: summary
+      type: str
+    prd:
+      conceptual_info: This node sets up an isolated temporary directory for testing
+        by creating a unique directory, verifying the availability and executability
+        of essential system utilities, checking directory permissions and symlinks,
+        and recording the results. It then generates a cleanup command and returns
+        a structured summary of the environment setup.
+      docstring:
+        examples:
+        - lines:
+          - import os
+          - import tempfile
+          - import which
+          - import pwd
+          - import grp
+          - import stat
+          output: '{''env_dir'': ''/tmp/test_env.XXXXXX'', ''utils_ok'': True, ''permissions_ok'':
+            True, ''symlinks_ok'': True, ''cleanup_command'': ''rm -rf /tmp/test_env.XXXXXX'',
+            ''summary'': ''Environment setup successful.''}'
+        parameters:
+        - description: The current working directory where the temporary directory
+            will be created.
+          name: current_working_directory
+          type: str
+        raises:
+        - description: If an input is invalid or cannot be resolved.
+          type: ValueError
+        returns:
+          description: Dictionary containing the declared output fields.
+          type: dict
+        summary: Setup isolated temporary directory and verify utilities for testing.
     prompt: '1. Create a uniquely named temporary directory (e.g., using `mktemp -d
       -t test_env.XXXXXX`) in the current working directory and capture its absolute
       path.
@@ -26,196 +264,49 @@ nodes:
       6. Return a structured summary of the environment setup, including success/failure
       status for each check, any relevant environment variables (e.g., `PATH`), and
       a cleanup command.'
-    description: Creates an isolated temporary directory for testing, verifies that
-      essential system utilities are available, and records all necessary information
-      to enable safe cleanup. Returns a JSON object with fields `env_dir`, `utils_ok`,
-      `permissions_ok`, `symlinks_ok`, `cleanup_command`, and a summary of the environment
-      setup.
-    agent: false
-    output_structure:
-    - key: env_dir
-      type: str
-      description: Absolute path of the isolated temporary directory
-    - key: utils_ok
-      type: bool
-      description: Whether the essential system utilities are verified and available
-    - key: permissions_ok
-      type: bool
-      description: Whether the new directory has mode `0700` and is isolated
-    - key: symlinks_ok
-      type: bool
-      description: Whether the new directory contains no symlinks
-    - key: cleanup_command
-      type: str
-      description: Shell command to safely remove the directory after tests complete
-    - key: summary
-      type: str
-      description: Summary of the environment setup, including success/failure status
-        for each check and relevant environment variables
-    prd:
-      conceptual_info: This node sets up an isolated temporary directory for testing
-        by creating a unique directory, verifying the availability and executability
-        of essential system utilities, checking directory permissions and symlinks,
-        and recording the results. It then generates a cleanup command and returns
-        a structured summary of the environment setup.
-      docstring:
-        summary: Setup isolated temporary directory and verify utilities for testing.
-        parameters:
-        - name: current_working_directory
-          type: str
-          description: The current working directory where the temporary directory
-            will be created.
-        returns:
-          type: dict
-          description: Dictionary containing the declared output fields.
-        raises:
-        - type: ValueError
-          description: If an input is invalid or cannot be resolved.
-        examples:
-        - lines:
-          - import os
-          - import tempfile
-          - import which
-          - import pwd
-          - import grp
-          - import stat
-          output: '{''env_dir'': ''/tmp/test_env.XXXXXX'', ''utils_ok'': True, ''permissions_ok'':
-            True, ''symlinks_ok'': True, ''cleanup_command'': ''rm -rf /tmp/test_env.XXXXXX'',
-            ''summary'': ''Environment setup successful.''}'
-  execute_test:
-    name: execute_test
-    nodes_depended_on:
-    - prepare_test_environment
-    nodes_dependent_on: []
-    prompt: 'Navigate to the test environment directory and execute the system echo
-      binary with the exact argument `TEST_PASSED`:'
-    description: Runs a deterministic echo command inside the isolated test environment,
-      captures its exact standard output—including the trailing newline—and validates
-      it against the predefined expected string.
-    agent: false
-    output_structure:
-    - key: raw_output
-      type: str
-      description: The command’s standard output, including any trailing newline.
-    - key: passed
-      type: bool
-      description: Whether the output matched the expectation.
-    prd:
-      conceptual_info: Validate the exact output of a deterministic echo command inside
-        a prepared isolated environment against a predefined expected string.
-      docstring:
-        summary: Run a deterministic echo command and validate its output.
-        parameters:
-        - name: env_dir
-          type: str
-          description: AbsolutePath to the isolated test environment directory.
-        - name: expected_string
-          type: str
-          description: Predefined expected string to be validated against the command’s
-            standard output.
-        returns:
-          type: dict
-          description: 'Dictionary containing the declared output fields: `raw_output`
-            and `passed`.'
-        raises:
-        - type: ValueError
-          description: If the environment directory is unavailable or the expected
-            string is empty.
-        examples:
-        - lines:
-          - execute_test(env_dir='/test/env', expected_string='TEST_PASSED')
-          output: '{''raw_output'': ''TEST_PASSED\n'', ''passed'': True}'
-  collect_test_output:
-    name: collect_test_output
-    nodes_depended_on:
-    - execute_test
-    nodes_dependent_on: []
-    prompt: 'Read the `raw_output` string supplied by the `execute_test` node. Search
-      the string for the exact substring `TEST_PASSED`. If the substring is found,
-      set the field `test_status` to the string "PASSED"; otherwise set it to "FAILED".
-      Construct a JSON object with two keys:
-
-
-      - `test_status`: a literal string either "PASSED" or "FAILED".
-
-      - `raw_output`: the original captured output string, preserved exactly as received
-      (including all whitespace, line breaks, and any trailing newline).
-
-
-      Return this JSON object as the sole output of the node.'
-    description: Collects test output and sets test status based on 'TEST_PASSED'
-      presence.
-    agent: false
-    output_structure:
-    - key: test_status
-      type: str
-      description: Literal string indicating the test status, either "PASSED" or "FAILED"
-    - key: raw_output
-      type: str
-      description: Original captured output string, preserved exactly as received
-    prd:
-      conceptual_info: This node parses the test execution output from the execute_test
-        node and assigns a pass/fail status based on whether the 'TEST_PASSED' substring
-        is present. It returns a clean JSON object with test_status and raw_output
-        preserved from the original output.
-      docstring:
-        summary: Collects test output and sets test status.
-        parameters:
-        - name: raw_output
-          type: str
-          description: String supplied by the execute_test node.
-        returns:
-          type: dict
-          description: Dictionary with test_status and raw_output matching the declared
-            output_structure.
-        raises:
-        - type: ValueError
-          description: If the input string is empty or contains only whitespace.
-        examples:
-        - lines:
-          - 'parse_test_output(''TEST_PASSED
-
-            Test Output'')'
-          output: '{''test_status'': ''PASSED'', ''raw_output'': ''TEST_PASSED\nTest
-            Output''}'
-        - lines:
-          - parse_test_output('Test Output')
-          output: '{''test_status'': ''FAILED'', ''raw_output'': ''Test Output''}'
+    shims: []
   summarize_test_results:
+    agent: false
+    code_node_type: stub
+    description: Creates a human-readable summary of test execution results, preserving
+      formatting, by including the exact raw output wrapped in backticks.
+    implementation: "from pydantic import BaseModel, Field\n\n\nclass CollectTestOutputOutput(BaseModel):\n\
+      \    \"\"\"Pydantic model for collect_test_output node outputs.\"\"\"\n    test_status:\
+      \ str = (\n        Field(..., description=\"Literal string indicating the test\
+      \ status, either \\\"PASSED\\\" or \\\"FAILED\\\"\")\n    )\n    raw_output:\
+      \ str = (\n        Field(..., description=\"Original captured output string,\
+      \ preserved exactly as received\")\n    )\n\n\nclass SummarizeTestResultsOutput(BaseModel):\n\
+      \    \"\"\"Pydantic model for summarize_test_results node outputs.\"\"\"\n \
+      \   summary: str = (\n        Field(..., description=\"A single paragraph that\
+      \ states the test outcome, includes the exact raw output wrapped in backticks,\
+      \ and is formatted for clear, standalone logging or display.\")\n    )\n\n\n\
+      def summarize_test_results(collect_test_output_input: CollectTestOutputOutput,\
+      \ **kwargs) -> SummarizeTestResultsOutput:\n    \"\"\"\n    Generate a concise\
+      \ summary of test execution results.\n\n    Parameters\n    ----------\n   \
+      \ raw_output : str\n        Raw output string from the collect_test_output node,\
+      \ including test\n        status and any output content.\n\n    Returns\n  \
+      \  -------\n    str\n        Human-readable summary of test execution results,\
+      \ including the\n        exact raw_output value wrapped in backticks.\n\n  \
+      \  Raises\n    ------\n    ValueError\n        If raw_output is not a valid\
+      \ JSON string or test_status is neither\n        'PASSED' nor 'FAILED'.\n\n\
+      \    Examples\n    --------\n    >>> summarize_test_results('TEST_PASSED\nThis\
+      \ is a test report.')\n    Pass: 'TEST_PASSED\n    This is a test report.'\n\
+      \n    \"\"\"\n    return SummarizeTestResultsOutput(\n        summary=\"\",\n\
+      \    )"
     name: summarize_test_results
     nodes_depended_on:
     - collect_test_output
     nodes_dependent_on: []
-    prompt: Generate a concise paragraph that includes the test status and the exact
-      raw_output string from the previous step, clearly stating whether the test passed
-      or failed using the keyword and enclosing the full raw_output value in backticks.
-    description: Creates a human-readable summary of test execution results, preserving
-      formatting, by including the exact raw output wrapped in backticks.
-    agent: false
     output_structure:
-    - key: summary
-      type: str
-      description: A single paragraph that states the test outcome, includes the exact
+    - description: A single paragraph that states the test outcome, includes the exact
         raw output wrapped in backticks, and is formatted for clear, standalone logging
         or display.
+      key: summary
+      type: str
     prd:
       conceptual_info: Process raw output from the collect_test_output node to produce
         a human-readable summary with the exact raw_output value.
       docstring:
-        summary: Generate a concise summary of test execution results.
-        parameters:
-        - name: raw_output
-          type: str
-          description: Raw output string from the collect_test_output node, including
-            test status and any output content.
-        returns:
-          type: str
-          description: Human-readable summary of test execution results, including
-            the exact raw_output value wrapped in backticks.
-        raises:
-        - type: ValueError
-          description: If raw_output is not a valid JSON string or test_status is
-            neither 'PASSED' nor 'FAILED'.
         examples:
         - lines:
           - 'summarize_test_results(''TEST_PASSED
@@ -224,3 +315,21 @@ nodes:
           output: 'Pass: ''TEST_PASSED
 
             This is a test report.'''
+        parameters:
+        - description: Raw output string from the collect_test_output node, including
+            test status and any output content.
+          name: raw_output
+          type: str
+        raises:
+        - description: If raw_output is not a valid JSON string or test_status is
+            neither 'PASSED' nor 'FAILED'.
+          type: ValueError
+        returns:
+          description: Human-readable summary of test execution results, including
+            the exact raw_output value wrapped in backticks.
+          type: str
+        summary: Generate a concise summary of test execution results.
+    prompt: Generate a concise paragraph that includes the test status and the exact
+      raw_output string from the previous step, clearly stating whether the test passed
+      or failed using the keyword and enclosing the full raw_output value in backticks.
+    shims: []
