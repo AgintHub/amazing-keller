@@ -1,70 +1,75 @@
-name: test
+name: test_workflow
 dag_type: plain_text
-description: A workflow for testing a hypothesis or idea to determine its validity.
+description: A workflow for testing the system.
 nodes:
-  refine_objective:
-    name: refine_objective
+  initiate_test:
+    name: initiate_test
     nodes_depended_on: []
     nodes_dependent_on: []
-    prompt: What is the exact hypothesis or problem you are trying to solve? Be as
-      specific as possible.
-    description: Clearly articulate the objective or question to be tested.
+    prompt: Initiate a test of the system. Verify all critical components are operational.
+    description: Initial test to verify system readiness.
     agent: false
-  determine_scope:
-    name: determine_scope
+  gather_requirements:
+    name: gather_requirements
     nodes_depended_on:
-    - refine_objective
+    - initiate_test
     nodes_dependent_on: []
-    prompt: What specific areas or elements will be evaluated? What will be outside
-      of the scope?
-    description: Define the boundaries and scope of the test or evaluation.
+    prompt: Review and gather all necessary requirements for the test environment.
+    description: Accumulate requirements for the test environment.
     agent: false
-  identify_required_data:
-    name: identify_required_data
+  create_test_environment:
+    name: create_test_environment
     nodes_depended_on:
-    - determine_scope
+    - gather_requirements
     nodes_dependent_on: []
-    prompt: What specific data points are required to answer the objective question?
-      Quantitative or qualitative metrics?
-    description: Determine what data is necessary for the test or evaluation.
+    prompt: Configure and create the test environment based on the gathered requirements.
+    description: Establish the test environment.
     agent: false
-  collect_data:
-    name: collect_data
+  design_test_plan:
+    name: design_test_plan
     nodes_depended_on:
-    - identify_required_data
+    - create_test_environment
     nodes_dependent_on: []
-    prompt: Where will the required data be obtained? What sources will be used? How
-      will the data be formatted?
-    description: Gather and organize the necessary data for the test or evaluation.
+    prompt: Develop a comprehensive test plan for the system.
+    description: Create a detailed test plan.
     agent: false
-  evaluate_evidence:
-    name: evaluate_evidence
+  execute_test_cases:
+    name: execute_test_cases
     nodes_depended_on:
-    - collect_data
+    - design_test_plan
     nodes_dependent_on: []
-    prompt: What specific patterns, trends, or anomalies exist in the data that support
-      or contradict the objective? Identify any key insights.
-    description: Assess and interpret the collected data in relation to the objective
-      question.
+    prompt: Run the test cases as outlined in the test plan.
+    description: Execute test cases to verify system functionality.
     agent: false
-  determine_outcome:
-    name: determine_outcome
+  analyze_results:
+    name: analyze_results
     nodes_depended_on:
-    - evaluate_evidence
+    - execute_test_cases
     nodes_dependent_on: []
-    prompt: What does the evidence suggest? Does it support the original hypothesis
-      or reveal a different perspective? What does this imply for future action or
-      decision-making?
-    description: Draw a conclusion or make a decision based on the evaluation of the
-      evidence.
+    prompt: Evaluate the results of the test execution to identify any errors or issues.
+    description: Assess test results to identify potential problems.
     agent: false
-  refine_next_steps:
-    name: refine_next_steps
+  fix_errors:
+    name: fix_errors
     nodes_depended_on:
-    - determine_outcome
+    - analyze_results
     nodes_dependent_on: []
-    prompt: What specific actions will be taken based on the conclusion? What adjustments
-      will be made to future plans or procedures?
-    description: Outline and adjust plans for further investigation or implementation
-      based on the outcome of the test or evaluation.
+    prompt: Correct any errors or issues identified during the result analysis.
+    description: Address identified problems and implement fixes.
+    agent: false
+  verify_fixes:
+    name: verify_fixes
+    nodes_depended_on:
+    - fix_errors
+    nodes_dependent_on: []
+    prompt: Verify that the errors or issues have been successfully resolved.
+    description: Confirm fixes have improved system functionality.
+    agent: false
+  conclude_test:
+    name: conclude_test
+    nodes_depended_on:
+    - verify_fixes
+    nodes_dependent_on: []
+    prompt: Document the findings and conclude the test process.
+    description: Capture lessons learned and finalize the test process.
     agent: false
