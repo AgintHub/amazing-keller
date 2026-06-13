@@ -1,58 +1,78 @@
-name: workflow_for_testing
+name: test_execution_plan
 dag_type: plain_text
-description: A workflow for conducting tests.
+description: Detailed workflow for testing a process
 nodes:
-  define_test_objective:
-    name: define_test_objective
-    nodes_depended_on: []
-    nodes_dependent_on: []
-    prompt: What test objective do you want to achieve? Write a clear and concise
-      statement.
-    description: Define the purpose of the test.
-    agent: false
-  plan_test_environment:
-    name: plan_test_environment
+  initialize_testing_environment:
+    name: initialize_testing_environment
     nodes_depended_on:
-    - define_test_objective
+    - determine_test_scope
     nodes_dependent_on: []
-    prompt: Describe the test environment setup needed to execute the test.
-    description: Plan the test environment, including hardware, software, and any
-      other necessary resources.
+    prompt: Create a test environment suitable for executing the test plan.
+    description: Set up the necessary tools, software, and infrastructure for testing.
     agent: false
-  write_test_scenarios:
-    name: write_test_scenarios
+  determine_test_scope:
+    name: determine_test_scope
     nodes_depended_on:
-    - plan_test_environment
-    - define_test_objective
+    - initialize_testing_environment
+    - gather_test_data
     nodes_dependent_on: []
-    prompt: List the test scenarios to be executed.
-    description: Create clear and concise test scenarios that cover the test objective.
+    prompt: Determine the specific scope of the tests to be executed.
+    description: Identify the specific features, modules, or components to be tested.
     agent: false
-  implement_test_cases:
-    name: implement_test_cases
+  gather_test_data:
+    name: gather_test_data
     nodes_depended_on:
-    - write_test_scenarios
+    - determine_test_scope
+    - collect_test_inputs
     nodes_dependent_on: []
-    prompt: Implement the test cases using the chosen test framework.
-    description: Write the test cases using the chosen test framework, including the
-      test scenarios.
+    prompt: Collect the necessary data and inputs required for testing.
+    description: Gather the necessary information, parameters, or inputs required
+      to execute the test plan.
     agent: false
-  run_test_cases:
-    name: run_test_cases
+  collect_test_inputs:
+    name: collect_test_inputs
     nodes_depended_on:
-    - implement_test_cases
-    - plan_test_environment
+    - gather_test_data
+    - verify_test_inputs
     nodes_dependent_on: []
-    prompt: Run the test cases and verify the expected results.
-    description: Run the test cases and verify the expected results, using the test
-      environment setup.
+    prompt: Collect the necessary inputs and test data.
+    description: Gather the necessary data, parameters, or inputs required to execute
+      the test plan.
+    agent: false
+  verify_test_inputs:
+    name: verify_test_inputs
+    nodes_depended_on:
+    - collect_test_inputs
+    - execute_test_plan
+    nodes_dependent_on: []
+    prompt: Verify that the test inputs and data are valid and accurate.
+    description: Check that the collected test inputs and data meet the required standards
+      and specifications.
+    agent: false
+  execute_test_plan:
+    name: execute_test_plan
+    nodes_depended_on:
+    - verify_test_inputs
+    - analyze_test_results
+    nodes_dependent_on: []
+    prompt: Execute the test plan using the gathered test data and inputs.
+    description: Run the test plan using the collected test data and inputs.
     agent: false
   analyze_test_results:
     name: analyze_test_results
     nodes_depended_on:
-    - run_test_cases
+    - execute_test_plan
+    - document_test_results
     nodes_dependent_on: []
-    prompt: Analyze the test results to determine the test outcome.
-    description: Analyze the test results to determine if the test successful and
-      meet the test objective.
+    prompt: Analyze the test results to determine pass or fail status.
+    description: Check the test results to determine if the test passed or failed.
+    agent: false
+  document_test_results:
+    name: document_test_results
+    nodes_depended_on:
+    - analyze_test_results
+    nodes_dependent_on: []
+    prompt: Document the test results and create a test report.
+    description: Create a report summarizing the test results, including pass or fail
+      status, and any errors or issues encountered.
     agent: false

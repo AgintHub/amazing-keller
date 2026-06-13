@@ -1,0 +1,7 @@
+# Managed by AGITransfer: never sync artifacts or secrets
+*.zip
+id_ed25519
+id_ed25519.pub
+id_rsa
+id_rsa.pub
+.ssh/
