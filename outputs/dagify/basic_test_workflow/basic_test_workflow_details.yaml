@@ -6,41 +6,45 @@ nodes:
     name: prepare_test_environment
     nodes_depended_on: []
     nodes_dependent_on: []
-    prompt: Create a temporary folder named `test_env` in the current working directory.
-      Verify that the `echo` command is available. Return a JSON object with a boolean
-      field `environment_ready` indicating success.
-    description: Create a temporary directory and ensure required tools are available
-      for the test.
+    prompt: Construct a temporary directory named `test_env` in the current working
+      directory. Ensure the `echo`, `ls`, and `mkdir` commands are available. Return
+      a JSON object with a boolean field `environment_ready` indicating success.
+    description: Create a temporary working directory to isolate test dependencies.
+      Verify the availability of fundamental system tools required for the test workflow.
     agent: false
   execute_test:
     name: execute_test
     nodes_depended_on:
     - prepare_test_environment
     nodes_dependent_on: []
-    prompt: If `environment_ready` is true, change into the `test_env` directory and
-      execute `echo TEST_PASSED`. Capture the standard output string and return it
-      as `raw_output`.
-    description: Run a simple test command inside the prepared environment and capture
-      its stdout.
+    prompt: Given an environment prepared with required tools, execute `echo TEST_PASSED`
+      inside `test_env` and capture the standard output string as `raw_output`.
+    description: Run a test command inside the prepared environment and capture its
+      stdout. Utilize the environment prepared by the preceding node to execute a
+      simple test, capturing its stdout output and returning it in the `raw_output`
+      field.
     agent: false
   collect_test_output:
     name: collect_test_output
     nodes_depended_on:
     - execute_test
     nodes_dependent_on: []
-    prompt: Inspect `raw_output`. If it contains the substring `TEST_PASSED`, set
-      `test_status` to `PASS`; otherwise set it to `FAIL`. Return a JSON object with
-      fields `test_status` and `raw_output`.
-    description: Process the raw output from the test command and determine pass/fail
-      status.
+    prompt: Inspect `raw_output` for the `TEST_PASSED` substring to determine the
+      test status (PASS or FAIL). Construct a JSON object with fields `test_status`
+      and `raw_output` based on the inspection result.
+    description: Thoroughly examine the `raw_output` from the test command, confirming
+      that it clearly indicates test success (`TEST_PASSED` present) or failure, and
+      accurately report the result in a JSON object containing fields `test_status`
+      and `raw_output`.
     agent: false
   summarize_test_results:
     name: summarize_test_results
     nodes_depended_on:
     - collect_test_output
     nodes_dependent_on: []
-    prompt: Produce a short paragraph summarizing the test result, mentioning the
-      `test_status` and including the exact `raw_output` string. Return the summary
+    prompt: Produce a clear, concise paragraph summarizing the test result, specifying
+      the `test_status` and including the exact `raw_output` string. Return the summary
       as `final_report`.
-    description: Generate a concise human‑readable summary of the test execution.
+    description: Generate a detailed human-readable summary of the test execution,
+      incorporating the `test_status` and exact `raw_output` string.
     agent: false
