@@ -36,4 +36,13 @@ def format_test_summary(test_status: str, raw_output: str) -> str:
     Fail: 'TEST_FAILED\nThis is a test report.'
 
     """
-    raise NotImplementedError("This is a virtual stub node that needs to be implemented")
+    if test_status not in ['PASSED', 'FAILED']:
+        raise ValueError("test_status must be either 'PASSED' or 'FAILED'")
+    
+    if not isinstance(raw_output, str):
+        raise ValueError("raw_output must be a valid string")
+    
+    if test_status == 'PASSED':
+        return f"Pass: '{raw_output}'"
+    else:
+        return f"Fail: '{raw_output}'"

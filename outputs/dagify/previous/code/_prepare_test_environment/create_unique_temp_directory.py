@@ -1,7 +1,3 @@
-import tempfile
-import os
-
-
 def create_unique_temp_directory() -> str:
     """
     Creates a unique temporary directory
@@ -33,6 +29,4 @@ def create_unique_temp_directory() -> str:
     Absolute path of a unique temporary directory with 'bar'
 
     """
-    
-    temp_dir = tempfile.mkdtemp()
-    return os.path.abspath(temp_dir)
+    raise NotImplementedError("This is a virtual stub node that needs to be implemented")

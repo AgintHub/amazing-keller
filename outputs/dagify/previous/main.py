@@ -6,9 +6,9 @@ import json
 import sys
 from typing import Dict, Any, List, Callable, Coroutine, Union, Optional
 
-from code.prepare_test_environment import prepare_test_environment
-from code.execute_test import execute_test
 from code.collect_test_output import collect_test_output
+from code.execute_test import execute_test
+from code.prepare_test_environment import prepare_test_environment
 from code.summarize_test_results import summarize_test_results
 
 # Get async mode from environment variable or default to False
@@ -31,9 +31,9 @@ def make_async(func):
 
     return async_wrapper
 
-prepare_test_environment_async = make_async(prepare_test_environment)
-execute_test_async = make_async(execute_test)
 collect_test_output_async = make_async(collect_test_output)
+execute_test_async = make_async(execute_test)
+prepare_test_environment_async = make_async(prepare_test_environment)
 summarize_test_results_async = make_async(summarize_test_results)
 
 async def run_workflow(user_input: str) -> Dict[str, Any]:

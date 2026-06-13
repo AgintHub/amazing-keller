@@ -1,3 +1,7 @@
+import shutil
+import os
+
+
 def verify_utility_availability(utility: str) -> str:
     """
     Verifies a system utility by checking its existence at a specific path.
@@ -29,4 +33,25 @@ def verify_utility_availability(utility: str) -> str:
     None
 
     """
-    raise NotImplementedError("This is a virtual stub node that needs to be implemented")
+    
+    if not isinstance(utility, str):
+        raise TypeError("Input utility must be a string")
+    
+    if not utility or not utility.strip():
+        raise TypeError("Utility name is invalid or empty")
+    
+    utility = utility.strip()
+    
+    try:
+        absolute_path = shutil.which(utility)
+        if absolute_path is None:
+            raise ValueError(f"Utility '{utility}' not found on the system")
+        
+        if not os.path.exists(absolute_path):
+            raise ValueError(f"Utility '{utility}' path exists but file is not accessible")
+        
+        return absolute_path
+    except Exception as e:
+        if isinstance(e, (ValueError, TypeError)):
+            raise
+        raise ValueError(f"Error occurred while checking utility '{utility}': {str(e)}")

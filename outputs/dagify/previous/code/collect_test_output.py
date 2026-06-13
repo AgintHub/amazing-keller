@@ -4,7 +4,9 @@ from pydantic import BaseModel, Field
 class ExecuteTestOutput(BaseModel):
     """Pydantic model for execute_test node outputs."""
     raw_output: str = (
-        Field(..., description="The command\u2019s standard output, including any trailing newline.")
+        Field(..., description = (
+            "The command\u2019s standard output, including any trailing newline.")
+        )
     )
     passed: bool = (
         Field(..., description="Whether the output matched the expectation.")
@@ -14,10 +16,14 @@ class ExecuteTestOutput(BaseModel):
 class CollectTestOutputOutput(BaseModel):
     """Pydantic model for collect_test_output node outputs."""
     test_status: str = (
-        Field(..., description="Literal string indicating the test status, either \"PASSED\" or \"FAILED\"")
+        Field(..., description = (
+            "Literal string indicating the test status, either "PASSED" or "FAILED"")
+        )
     )
     raw_output: str = (
-        Field(..., description="Original captured output string, preserved exactly as received")
+        Field(..., description = (
+            "Original captured output string, preserved exactly as received")
+        )
     )
 
 

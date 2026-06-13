@@ -7,6 +7,15 @@ from ._prepare_test_environment.check_for_symlinks import check_for_symlinks
 from ._prepare_test_environment.get_relevant_environment_variables import get_relevant_environment_variables
 from ._prepare_test_environment.generate_environment_summary import generate_environment_summary
 
+from ._prepare_test_environment.create_unique_temp_directory import create_unique_temp_directory
+from ._prepare_test_environment.get_absolute_path import get_absolute_path
+from ._prepare_test_environment.verify_utility_availability import verify_utility_availability
+from ._prepare_test_environment.check_directory_permissions import check_directory_permissions
+from ._prepare_test_environment.verify_directory_isolation import verify_directory_isolation
+from ._prepare_test_environment.check_for_symlinks import check_for_symlinks
+from ._prepare_test_environment.get_relevant_environment_variables import get_relevant_environment_variables
+from ._prepare_test_environment.generate_environment_summary import generate_environment_summary
+
 from pydantic import BaseModel, Field
 
 
@@ -90,7 +99,7 @@ def prepare_test_environment(general_input: str, **kwargs) -> PrepareTestEnviron
     has_symlinks: bool = check_for_symlinks(directory=env_dir_absolute)
     symlinks_valid: bool = not has_symlinks
     
-    cleanup_cmd: str = f"rm -rf \"{env_dir_absolute}\""
+    cleanup_cmd: str = f"rm -rf "{env_dir_absolute}""
     
     environment_vars: dict = get_relevant_environment_variables()
     setup_summary: str = generate_environment_summary(
