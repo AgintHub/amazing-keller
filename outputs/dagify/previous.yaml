@@ -7,35 +7,39 @@ nodes:
     nodes_depended_on: []
     nodes_dependent_on: []
     prompt: Construct a temporary directory named `test_env` in the current working
-      directory. Ensure the `echo`, `ls`, and `mkdir` commands are available. Return
-      a JSON object with a boolean field `environment_ready` indicating success.
-    description: Create a temporary working directory to isolate test dependencies.
-      Verify the availability of fundamental system tools required for the test workflow.
+      directory. Verify the availability of fundamental system tools (e.g., `echo`,
+      `ls`, and `mkdir`) required for the test workflow. Ensure that the test environment
+      is isolated from the rest of the system and can be safely deleted after use.
+    description: Prepare a self-contained temporary test environment to isolate test
+      dependencies and verify the availability of essential system tools. This environment
+      is designed to be ephemeral, allowing for safe and predictable testing without
+      compromising the system's stability or security.
     agent: false
   execute_test:
     name: execute_test
     nodes_depended_on:
     - prepare_test_environment
     nodes_dependent_on: []
-    prompt: Given an environment prepared with required tools, execute `echo TEST_PASSED`
-      inside `test_env` and capture the standard output string as `raw_output`.
-    description: Run a test command inside the prepared environment and capture its
-      stdout. Utilize the environment prepared by the preceding node to execute a
-      simple test, capturing its stdout output and returning it in the `raw_output`
-      field.
+    prompt: Given the "test_env" environment prepared by the preceding node and the
+      required tools verified by that node, execute `echo TEST_PASSED` and capture
+      the standard output string as raw_output.
+    description: Executes a simple test inside the prepared environment, capturing
+      its stdout output and returning it in the raw_output field, while ensuring the
+      test can utilize the environment prepared by the preceding "prepare_test_environment"
+      node.
     agent: false
   collect_test_output:
     name: collect_test_output
     nodes_depended_on:
     - execute_test
     nodes_dependent_on: []
-    prompt: Inspect `raw_output` from the test command for the `TEST_PASSED` substring
-      to determine the test status (PASS or FAIL), and construct a JSON object with
-      fields `test_status` and `raw_output` based on the inspection result.
-    description: Thoroughly examine the `raw_output` from the test command, confirming
-      that it clearly indicates test success (`TEST_PASSED` present) and accurately
-      reports the result in a JSON object containing fields `test_status` and `raw_output`,
-      as informed by the `execute_test` node.
+    prompt: Inspect the `raw_output` of the test command for the exact presence of
+      the `TEST_PASSED` substring, and construct a JSON object containing fields `test_status`
+      and `raw_output` to report the test outcome based on the inspection result.
+    description: Rigorously examine the `raw_output` from the test command, confirming
+      the presence of `TEST_PASSED` to signify test success and accurately reporting
+      the result in a JSON object with fields `test_status` and `raw_output`, as informed
+      by the output of the `execute_test` node.
     agent: false
   summarize_test_results:
     name: summarize_test_results
