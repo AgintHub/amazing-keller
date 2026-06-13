@@ -1,5 +1,5 @@
 name: basic_test_workflow
-dag_type: plain_text
+dag_type: typed
 description: Generated workflow from UI.
 nodes:
   prepare_test_environment:
@@ -20,15 +20,38 @@ nodes:
       4. Record the results of each check in a structured format (e.g., a JSON object
       with fields `env_dir`, `utils_ok`, `permissions_ok`, `symlinks_ok`).
 
-      5. Generate a cleanup shell command (`rm -rf "${env_dir}"`) that safely removes
+      5. Generate a cleanup shell command (`rm -rf \"${env_dir}\"` ) that safely removes
       the directory after tests complete.
 
-      6. Return a concise summary of the environment setup, including success/failure
-      status for each check and any relevant environment variables (e.g., `PATH`).'
+      6. Return a structured summary of the environment setup, including success/failure
+      status for each check, any relevant environment variables (e.g., `PATH`), and
+      a cleanup command.'
     description: Creates an isolated temporary directory for testing, verifies that
       essential system utilities are available, and records all necessary information
-      to enable safe cleanup.
+      to enable safe cleanup. Returns a JSON object with fields `env_dir`, `utils_ok`,
+      `permissions_ok`, `symlinks_ok`, `cleanup_command`, and a summary of the environment
+      setup.
     agent: false
+    output_structure:
+    - key: env_dir
+      type: str
+      description: Absolute path of the isolated temporary directory
+    - key: utils_ok
+      type: bool
+      description: Whether the essential system utilities are verified and available
+    - key: permissions_ok
+      type: bool
+      description: Whether the new directory has mode `0700` and is isolated
+    - key: symlinks_ok
+      type: bool
+      description: Whether the new directory contains no symlinks
+    - key: cleanup_command
+      type: str
+      description: Shell command to safely remove the directory after tests complete
+    - key: summary
+      type: str
+      description: Summary of the environment setup, including success/failure status
+        for each check and relevant environment variables
   execute_test:
     name: execute_test
     nodes_depended_on:
@@ -37,30 +60,22 @@ nodes:
     prompt: 'Navigate to the `test_env` directory created by the previous step. Execute
       the system `echo` binary with the exact argument `TEST_PASSED`:
 
-
       ```bash
 
       cd test_env && /usr/bin/echo TEST_PASSED
 
-      ```
-
-
-      Capture the command’s standard output, including any trailing newline, as a
-      string and assign it to the field `raw_output`. The expected value is the literal
-      string `TEST_PASSED
-
-      `. Compare `raw_output` to this expected value and raise an error if they differ.
-      Do not append any additional characters, whitespace, or logging information
-      to `raw_output`.
-
-
-      After verification, return a JSON object containing `raw_output` and a boolean
-      field `passed` indicating whether the output matched the expectation.'
+      ```'
     description: Runs a deterministic echo command inside the isolated test environment,
       captures its exact standard output—including the trailing newline—and validates
-      it against the predefined expected string. The node ensures the output is captured
-      verbatim and reports success or failure of the match.
+      it against the predefined expected string.
     agent: false
+    output_structure:
+    - key: raw_output
+      type: str
+      description: The command’s standard output, including any trailing newline.
+    - key: passed
+      type: bool
+      description: Whether the output matched the expectation.
   collect_test_output:
     name: collect_test_output
     nodes_depended_on:
@@ -69,62 +84,35 @@ nodes:
     prompt: 'Read the `raw_output` string supplied by the `execute_test` node. Search
       the string for the exact substring `TEST_PASSED`. If the substring is found,
       set the field `test_status` to the string "PASSED"; otherwise set it to "FAILED".
-      Construct a JSON object with two keys:
-
-
-      - `test_status`: a literal string either "PASSED" or "FAILED".
-
-      - `raw_output`: the original captured output string, preserved exactly as received
-      (including all whitespace, line breaks, and any trailing newline).
-
-
-      Return this JSON object as the sole output of the node.
-
-
-      Example output when the test passes:
-
-      ```json
-
-      { "test_status": "PASSED", "raw_output": "TEST_PASSED\n" }
-
-      ```
-
-
-      Example output when the test fails:
-
-      ```json
-
-      { "test_status": "FAILED", "raw_output": "Some unexpected output\n" }
-
-      ```'
+      Construct a JSON object with two keys: \n\n- `test_status`: a literal string
+      either "PASSED" or "FAILED".\n- `raw_output`: the original captured output string,
+      preserved exactly as received (including all whitespace, line breaks, and any
+      trailing newline).\n\nReturn this JSON object as the sole output of the node.'
     description: Extracts the success indicator from the test execution output, assigns
       a pass/fail status accordingly, and returns a clean JSON summary that preserves
       the raw output verbatim for downstream analysis.
     agent: false
+    output_structure:
+    - key: test_status
+      type: str
+      description: Literal string indicating the test status, either "PASSED" or "FAILED"
+    - key: raw_output
+      type: str
+      description: Original captured output string, preserved exactly as received
   summarize_test_results:
     name: summarize_test_results
     nodes_depended_on:
     - collect_test_output
     nodes_dependent_on: []
-    prompt: 'Generate a concise paragraph that includes the test status and the exact
-      raw_output string from the previous step. The summary should:
-
-      1. Clearly state whether the test passed or failed using the keyword "PASSED"
-      or "FAILED".
-
-      2. Enclose the full raw_output value in backticks to preserve formatting.
-
-      3. If the raw_output contains multiple lines, maintain the original line breaks
-      inside the backticks.
-
-      4. Not add any additional commentary, headings, or formatting beyond what is
-      specified.
-
-      The output must be a single paragraph suitable for logging or display.'
-    description: Creates a human‑readable summary of test execution results. It receives
-      a JSON object containing `test_status` (either "PASSED" or "FAILED") and `raw_output`
-      (the full command output). The node must produce a short paragraph that states
-      the test outcome, includes the exact raw output wrapped in backticks (preserving
-      all whitespace and line breaks), and is formatted for clear, standalone logging
-      or display.
+    prompt: Generate a concise paragraph that includes the test status and the exact
+      raw_output string from the previous step, clearly stating whether the test passed
+      or failed using the keyword and enclosing the full raw_output value in backticks.
+    description: Creates a human‑readable summary of test execution results, preserving
+      formatting, by including the exact raw output wrapped in backticks.
     agent: false
+    output_structure:
+    - key: summary
+      type: str
+      description: A single paragraph that states the test outcome, includes the exact
+        raw output wrapped in backticks, and is formatted for clear, standalone logging
+        or display.
