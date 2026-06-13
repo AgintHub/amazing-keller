@@ -1,102 +1,75 @@
 name: test_workflow
 dag_type: plain_text
-description: A workflow for testing purposes.
+description: A workflow for testing the system.
 nodes:
-  evaluate_test_objective:
-    name: evaluate_test_objective
+  initiate_test:
+    name: initiate_test
     nodes_depended_on: []
     nodes_dependent_on: []
-    prompt: What is the purpose of this test?
-    description: Evaluate the test objective.
+    prompt: Initiate a test of the system. Verify all critical components are operational.
+    description: Initial test to verify system readiness.
     agent: false
-  define_test_approach:
-    name: define_test_approach
+  gather_requirements:
+    name: gather_requirements
     nodes_depended_on:
-    - evaluate_test_objective
+    - initiate_test
     nodes_dependent_on: []
-    prompt: Based on the objective, what approach will be used for testing?
-    description: Define the test approach.
+    prompt: Review and gather all necessary requirements for the test environment.
+    description: Accumulate requirements for the test environment.
     agent: false
-  create_test_plan:
-    name: create_test_plan
+  create_test_environment:
+    name: create_test_environment
     nodes_depended_on:
-    - define_test_approach
+    - gather_requirements
     nodes_dependent_on: []
-    prompt: Develop a test plan that outlines the specific tests to be performed.
-    description: Create a test plan based on the defined approach.
+    prompt: Configure and create the test environment based on the gathered requirements.
+    description: Establish the test environment.
     agent: false
-  conduct_test:
-    name: conduct_test
+  design_test_plan:
+    name: design_test_plan
     nodes_depended_on:
-    - create_test_plan
+    - create_test_environment
     nodes_dependent_on: []
-    prompt: Perform the specified tests in the test plan.
-    description: Conduct the test according to the test plan.
+    prompt: Develop a comprehensive test plan for the system.
+    description: Create a detailed test plan.
     agent: false
-  evaluate_test_results:
-    name: evaluate_test_results
+  execute_test_cases:
+    name: execute_test_cases
     nodes_depended_on:
-    - conduct_test
+    - design_test_plan
     nodes_dependent_on: []
-    prompt: Assess the outcomes of the tests and determine their pass or fail status.
-    description: Evaluate the results of the test.
+    prompt: Run the test cases as outlined in the test plan.
+    description: Execute test cases to verify system functionality.
     agent: false
-  document_test_results:
-    name: document_test_results
+  analyze_results:
+    name: analyze_results
     nodes_depended_on:
-    - evaluate_test_results
+    - execute_test_cases
     nodes_dependent_on: []
-    prompt: Record the test results, including any failures or issues.
-    description: Document the evaluation results.
+    prompt: Evaluate the results of the test execution to identify any errors or issues.
+    description: Assess test results to identify potential problems.
     agent: false
-  identify_areas_for_improvement:
-    name: identify_areas_for_improvement
+  fix_errors:
+    name: fix_errors
     nodes_depended_on:
-    - document_test_results
+    - analyze_results
     nodes_dependent_on: []
-    prompt: Analyze the test results to determine where improvements are needed.
-    description: Identify areas for improvement based on the test results.
+    prompt: Correct any errors or issues identified during the result analysis.
+    description: Address identified problems and implement fixes.
     agent: false
-  prioritize_areas_for_improvement:
-    name: prioritize_areas_for_improvement
+  verify_fixes:
+    name: verify_fixes
     nodes_depended_on:
-    - identify_areas_for_improvement
+    - fix_errors
     nodes_dependent_on: []
-    prompt: Order the areas for improvement by priority to ensure the most critical
-      ones are addressed first.
-    description: Prioritize the areas for improvement.
+    prompt: Verify that the errors or issues have been successfully resolved.
+    description: Confirm fixes have improved system functionality.
     agent: false
-  create_action_plan:
-    name: create_action_plan
+  conclude_test:
+    name: conclude_test
     nodes_depended_on:
-    - prioritize_areas_for_improvement
+    - verify_fixes
     nodes_dependent_on: []
-    prompt: Develop a plan that outlines the specific actions to be taken to address
-      the prioritized areas for improvement.
-    description: Create an action plan to address the areas for improvement.
-    agent: false
-  implement_action_plan:
-    name: implement_action_plan
-    nodes_depended_on:
-    - create_action_plan
-    nodes_dependent_on: []
-    prompt: Take the specific actions outlined in the plan to address the prioritized
-      areas for improvement.
-    description: Implement the action plan.
-    agent: false
-  evaluate_progress:
-    name: evaluate_progress
-    nodes_depended_on:
-    - implement_action_plan
-    nodes_dependent_on: []
-    prompt: Assess the outcomes of the action plan to determine the progress made.
-    description: Evaluate the progress made after implementing the action plan.
-    agent: false
-  document_progress:
-    name: document_progress
-    nodes_depended_on:
-    - evaluate_progress
-    nodes_dependent_on: []
-    prompt: Record the outcomes of the progress evaluation.
-    description: Document the evaluation of progress.
+    prompt: Document the findings and conclude the test process.
+    description: Capture lessons learned and finalize the test process.
     agent: false
