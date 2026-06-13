@@ -1,7 +1,6 @@
 name: basic_test_workflow
 dag_type: plain_text
-description: A minimal workflow that sets up a test environment, runs a simple test
-  command, captures its output, and summarizes the result.
+description: Generated workflow from UI.
 nodes:
   prepare_test_environment:
     name: prepare_test_environment
