@@ -43,4 +43,43 @@ def generate_environment_summary(env_dir: str, utils_ok: str, permissions_ok: st
     A string containing the environment summary.
 
     """
-    raise NotImplementedError("This is a virtual stub node that needs to be implemented")
+    if not isinstance(env_dir, str):
+        raise TypeError("env_dir must be of type str")
+    if not isinstance(utils_ok, str):
+        raise TypeError("utils_ok must be of type str")
+    if not isinstance(permissions_ok, str):
+        raise TypeError("permissions_ok must be of type str")
+    if not isinstance(symlinks_ok, str):
+        raise TypeError("symlinks_ok must be of type str")
+    if not isinstance(env_vars, str):
+        raise TypeError("env_vars must be of type str")
+    
+    summary_lines = []
+    summary_lines.append("Environment Setup Summary")
+    summary_lines.append("=" * 28)
+    summary_lines.append("")
+    
+    summary_lines.append(f"Environment Directory: {env_dir}")
+    summary_lines.append("")
+    
+    summary_lines.append("Status Checks:")
+    
+    utils_status = "PASS" if utils_ok.lower() in ['true', 'yes', '1', 'pass', 'ok'] else "FAIL"
+    summary_lines.append(f"  - System utilities available: {utils_status}")
+    
+    permissions_status = "PASS" if permissions_ok.lower() in ['true', 'yes', '1', 'pass', 'ok'] else "FAIL"
+    summary_lines.append(f"  - Directory permissions (0700): {permissions_status}")
+    
+    symlinks_status = "PASS" if symlinks_ok.lower() in ['true', 'yes', '1', 'pass', 'ok'] else "FAIL"
+    summary_lines.append(f"  - No symlinks present: {symlinks_status}")
+    
+    summary_lines.append("")
+    summary_lines.append("Environment Variables:")
+    if env_vars.strip():
+        for line in env_vars.strip().split('\n'):
+            if line.strip():
+                summary_lines.append(f"  {line.strip()}")
+    else:
+        summary_lines.append("  (None specified)")
+    
+    return "\n".join(summary_lines)

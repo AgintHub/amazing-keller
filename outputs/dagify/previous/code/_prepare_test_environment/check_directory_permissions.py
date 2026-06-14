@@ -1,3 +1,7 @@
+import os
+import stat
+
+
 def check_directory_permissions(directory: str) -> str:
     """
     Checks the directory permissions of a given directory.
@@ -28,4 +32,24 @@ def check_directory_permissions(directory: str) -> str:
     'another_mode'
 
     """
-    raise NotImplementedError("This is a virtual stub node that needs to be implemented")
+    
+    if not isinstance(directory, str):
+        raise TypeError("Input must be a string")
+    
+    if not directory or not directory.strip():
+        raise ValueError("Directory path cannot be empty")
+    
+    try:
+        if not os.path.exists(directory):
+            raise ValueError(f"Directory path does not exist: {directory}")
+        
+        if not os.path.isdir(directory):
+            raise ValueError(f"Path is not a directory: {directory}")
+        
+        dir_stat = os.stat(directory)
+        mode = stat.S_IMODE(dir_stat.st_mode)
+        mode_string = oct(mode)[2:]
+        
+        return mode_string
+    except OSError as e:
+        raise ValueError(f"Cannot access directory: {directory}") from e

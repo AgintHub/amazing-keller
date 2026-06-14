@@ -1,3 +1,7 @@
+import os
+import json
+
+
 def get_relevant_environment_variables() -> str:
     """
     Extracts relevant environment variables used in the prepare test environment
@@ -27,4 +31,38 @@ def get_relevant_environment_variables() -> str:
     '{key1: value1, key2: value2}'
 
     """
-    raise NotImplementedError("This is a virtual stub node that needs to be implemented")
+    
+    test_relevant_vars = [
+        'PATH',
+        'PYTHONPATH', 
+        'HOME',
+        'USER',
+        'LANG',
+        'LC_ALL',
+        'TMPDIR',
+        'TMP',
+        'TEMP',
+        'TEST_ENV',
+        'CI',
+        'GITHUB_ACTIONS',
+        'JENKINS_URL',
+        'BUILD_NUMBER',
+        'JOB_NAME'
+    ]
+    
+    environment_dict = {}
+    
+    for var in test_relevant_vars:
+        value = os.environ.get(var)
+        if value is not None:
+            environment_dict[var] = value
+    
+    for key, value in os.environ.items():
+        if ('TEST' in key.upper() or 
+            'BUILD' in key.upper() or 
+            'CI' in key.upper() or
+            key.startswith('PYTEST_') or
+            key.startswith('UNITTEST_')):
+            environment_dict[key] = value
+    
+    return json.dumps(environment_dict)

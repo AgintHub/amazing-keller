@@ -1,5 +1,7 @@
 from ._summarize_test_results.format_test_summary import format_test_summary
 
+from ._summarize_test_results.format_test_summary import format_test_summary
+
 from pydantic import BaseModel, Field
 
 

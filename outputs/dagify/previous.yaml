@@ -1,4 +1,4 @@
-dag_type: shim
+dag_type: pure
 description: Generated workflow from UI.
 name: basic_test_workflow
 nodes:
@@ -162,13 +162,21 @@ nodes:
     shims: []
   prepare_test_environment:
     agent: false
-    code_node_type: shim
+    code_node_type: pure
     description: Creates an isolated temporary directory for testing, verifies that
       essential system utilities are available, and records all necessary information
       to enable safe cleanup. Returns a JSON object with fields `env_dir`, `utils_ok`,
       `permissions_ok`, `symlinks_ok`, `cleanup_command`, and a summary of the environment
       setup.
     implementation: "from ._prepare_test_environment.create_unique_temp_directory\
+      \ import create_unique_temp_directory\nfrom ._prepare_test_environment.get_absolute_path\
+      \ import get_absolute_path\nfrom ._prepare_test_environment.verify_utility_availability\
+      \ import verify_utility_availability\nfrom ._prepare_test_environment.check_directory_permissions\
+      \ import check_directory_permissions\nfrom ._prepare_test_environment.verify_directory_isolation\
+      \ import verify_directory_isolation\nfrom ._prepare_test_environment.check_for_symlinks\
+      \ import check_for_symlinks\nfrom ._prepare_test_environment.get_relevant_environment_variables\
+      \ import get_relevant_environment_variables\nfrom ._prepare_test_environment.generate_environment_summary\
+      \ import generate_environment_summary\n\nfrom ._prepare_test_environment.create_unique_temp_directory\
       \ import create_unique_temp_directory\nfrom ._prepare_test_environment.get_absolute_path\
       \ import get_absolute_path\nfrom ._prepare_test_environment.verify_utility_availability\
       \ import verify_utility_availability\nfrom ._prepare_test_environment.check_directory_permissions\
@@ -212,7 +220,7 @@ nodes:
       \    permissions_valid: bool = directory_mode == \"0700\" and is_isolated\n\
       \    \n    has_symlinks: bool = check_for_symlinks(directory=env_dir_absolute)\n\
       \    symlinks_valid: bool = not has_symlinks\n    \n    cleanup_cmd: str = f\"\
-      rm -rf \\\"{env_dir_absolute}\\\"\"\n    \n    environment_vars: dict = get_relevant_environment_variables()\n\
+      rm -rf \"{env_dir_absolute}\"\"\n    \n    environment_vars: dict = get_relevant_environment_variables()\n\
       \    setup_summary: str = generate_environment_summary(\n        env_dir=env_dir_absolute,\n\
       \        utils_ok=utils_available,\n        permissions_ok=permissions_valid,\n\
       \        symlinks_ok=symlinks_valid,\n        env_vars=environment_vars\n  \
@@ -295,20 +303,19 @@ nodes:
       a cleanup command.'
     shims:
     - agent: false
-      code_node_type: virtual-stub
+      code_node_type: virtual-pure
       description: Creates a typed node for generating a unique temporary directory
-      implementation: "def create_unique_temp_directory() -> str:\n    \"\"\"\n  \
-        \  Creates a unique temporary directory\n\n    Parameters\n    ----------\n\
-        \    input_params : dict\n        Input parameters for the shim\n\n    Returns\n\
-        \    -------\n    str\n        The path to the created unique temporary directory\n\
-        \n    Raises\n    ------\n    ValueError\n        When input validation fails\n\
-        \    TypeError\n        When input types are incorrect\n\n    Examples\n \
-        \   --------\n    >>> temp_dir_path = create_unique_temp_directory()\n   \
-        \ Absolute path of a unique temporary directory\n\n    >>> temp_dir_path =\
-        \ create_unique_temp_directory(input_params={'foo':\n    'bar'})\n    Absolute\
-        \ path of a unique temporary directory with 'bar'\n\n    \"\"\"\n    raise\
-        \ NotImplementedError(\"This is a virtual stub node that needs to be implemented\"\
-        )"
+      implementation: "import tempfile\nimport os\n\n\ndef create_unique_temp_directory()\
+        \ -> str:\n    \"\"\"\n    Creates a unique temporary directory\n\n    Parameters\n\
+        \    ----------\n    input_params : dict\n        Input parameters for the\
+        \ shim\n\n    Returns\n    -------\n    str\n        The path to the created\
+        \ unique temporary directory\n\n    Raises\n    ------\n    ValueError\n \
+        \       When input validation fails\n    TypeError\n        When input types\
+        \ are incorrect\n\n    Examples\n    --------\n    >>> temp_dir_path = create_unique_temp_directory()\n\
+        \    Absolute path of a unique temporary directory\n\n    >>> temp_dir_path\
+        \ = create_unique_temp_directory(input_params={'foo':\n    'bar'})\n    Absolute\
+        \ path of a unique temporary directory with 'bar'\n\n    \"\"\"\n    \n  \
+        \  temp_dir = tempfile.mkdtemp()\n    return os.path.abspath(temp_dir)"
       name: create_unique_temp_directory
       nodes_depended_on: []
       nodes_dependent_on: []
@@ -345,18 +352,22 @@ nodes:
       selected_tools: []
       shims: []
     - agent: false
-      code_node_type: virtual-stub
+      code_node_type: virtual-pure
       description: Retrieve the absolute path of a given directory or file.
-      implementation: "def get_absolute_path(path: str) -> str:\n    \"\"\"\n    Obtain\
-        \ the absolute path of a directory or file.\n\n    Parameters\n    ----------\n\
-        \    path : str\n        The path for which the absolute path is to be retrieved.\n\
-        \n    Returns\n    -------\n    STR\n        The absolute path of the directory\
-        \ or file.\n\n    Raises\n    ------\n    ValueError\n        When the input\
-        \ path does not exist or is invalid.\n    TypeError\n        When the input\
-        \ path is not a string.\n\n    Examples\n    --------\n    >>> get_absolute_path('/home/user')\n\
-        \    /home/user\n\n    >>> get_absolute_path('./current_directory')\n    /current_directory\n\
-        \n    \"\"\"\n    raise NotImplementedError(\"This is a virtual stub node\
-        \ that needs to be implemented\")"
+      implementation: "import os\n\n\ndef get_absolute_path(path: str) -> str:\n \
+        \   \"\"\"\n    Obtain the absolute path of a directory or file.\n\n    Parameters\n\
+        \    ----------\n    path : str\n        The path for which the absolute path\
+        \ is to be retrieved.\n\n    Returns\n    -------\n    STR\n        The absolute\
+        \ path of the directory or file.\n\n    Raises\n    ------\n    ValueError\n\
+        \        When the input path does not exist or is invalid.\n    TypeError\n\
+        \        When the input path is not a string.\n\n    Examples\n    --------\n\
+        \    >>> get_absolute_path('/home/user')\n    /home/user\n\n    >>> get_absolute_path('./current_directory')\n\
+        \    /current_directory\n\n    \"\"\"\n    \n    if not isinstance(path, str):\n\
+        \        raise TypeError(\"The input path is not a string\")\n    \n    if\
+        \ not path:\n        raise ValueError(\"The input path does not exist or is\
+        \ invalid\")\n    \n    try:\n        absolute_path = os.path.abspath(path)\n\
+        \        return absolute_path\n    except Exception:\n        raise ValueError(\"\
+        When the input path does not exist or is invalid\")"
       name: get_absolute_path
       nodes_depended_on: []
       nodes_dependent_on: []
@@ -395,23 +406,32 @@ nodes:
       selected_tools: []
       shims: []
     - agent: false
-      code_node_type: virtual-stub
+      code_node_type: virtual-pure
       description: Verifies the availability of a utility on the system by checking
         its absolute path.
-      implementation: "def verify_utility_availability(utility: str) -> str:\n   \
-        \ \"\"\"\n    Verifies a system utility by checking its existence at a specific\
-        \ path.\n\n    Parameters\n    ----------\n    utility : str\n        The\
-        \ name of the utility to verify (e.g., `echo`, `ls`, `mkdir`).\n\n    Returns\n\
-        \    -------\n    dict\n        A dictionary containing the utility name and\
-        \ its absolute path if\n        found, otherwise `None` for the utility.\n\
-        \n    Raises\n    ------\n    ValueError\n        When the utility is not\
-        \ found or an error occurs while checking its\n        presence.\n    TypeError\n\
-        \        When the input type is incorrect or the utility name is invalid.\n\
-        \n    Examples\n    --------\n    >>> verify_utility_availability(utility='echo')\n\
+      implementation: "import shutil\nimport os\n\n\ndef verify_utility_availability(utility:\
+        \ str) -> str:\n    \"\"\"\n    Verifies a system utility by checking its\
+        \ existence at a specific path.\n\n    Parameters\n    ----------\n    utility\
+        \ : str\n        The name of the utility to verify (e.g., `echo`, `ls`, `mkdir`).\n\
+        \n    Returns\n    -------\n    dict\n        A dictionary containing the\
+        \ utility name and its absolute path if\n        found, otherwise `None` for\
+        \ the utility.\n\n    Raises\n    ------\n    ValueError\n        When the\
+        \ utility is not found or an error occurs while checking its\n        presence.\n\
+        \    TypeError\n        When the input type is incorrect or the utility name\
+        \ is invalid.\n\n    Examples\n    --------\n    >>> verify_utility_availability(utility='echo')\n\
         \    >>> verify_utility_availability(utility='non-existent-utility')\n   \
         \ {'output': '/bin/echo', 'utility': 'echo'}\n    None\n\n    \"\"\"\n   \
-        \ raise NotImplementedError(\"This is a virtual stub node that needs to be\
-        \ implemented\")"
+        \ \n    if not isinstance(utility, str):\n        raise TypeError(\"Input\
+        \ utility must be a string\")\n    \n    if not utility or not utility.strip():\n\
+        \        raise TypeError(\"Utility name is invalid or empty\")\n    \n   \
+        \ utility = utility.strip()\n    \n    try:\n        absolute_path = shutil.which(utility)\n\
+        \        if absolute_path is None:\n            raise ValueError(f\"Utility\
+        \ '{utility}' not found on the system\")\n        \n        if not os.path.exists(absolute_path):\n\
+        \            raise ValueError(f\"Utility '{utility}' path exists but file\
+        \ is not accessible\")\n        \n        return absolute_path\n    except\
+        \ Exception as e:\n        if isinstance(e, (ValueError, TypeError)):\n  \
+        \          raise\n        raise ValueError(f\"Error occurred while checking\
+        \ utility '{utility}': {str(e)}\")"
       name: verify_utility_availability
       nodes_depended_on: []
       nodes_dependent_on: []
@@ -453,19 +473,28 @@ nodes:
       selected_tools: []
       shims: []
     - agent: false
-      code_node_type: virtual-stub
+      code_node_type: virtual-pure
       description: Verifies the mode of a given directory and returns its mode as
         a string.
-      implementation: "def check_directory_permissions(directory: str) -> str:\n \
-        \   \"\"\"\n    Checks the directory permissions of a given directory.\n\n\
-        \    Parameters\n    ----------\n    directory : str\n        Path to the\
-        \ directory to check.\n\n    Returns\n    -------\n    str\n        Mode of\
-        \ the directory as a string.\n\n    Raises\n    ------\n    ValueError\n \
-        \       When the directory path is invalid.\n    TypeError\n        When the\
-        \ input type is incorrect.\n\n    Examples\n    --------\n    >>> check_directory_permissions('/path/to/directory')\n\
-        \    '0700'\n\n    >>> check_directory_permissions('/another/directory')\n\
-        \    'another_mode'\n\n    \"\"\"\n    raise NotImplementedError(\"This is\
-        \ a virtual stub node that needs to be implemented\")"
+      implementation: "import os\nimport stat\n\n\ndef check_directory_permissions(directory:\
+        \ str) -> str:\n    \"\"\"\n    Checks the directory permissions of a given\
+        \ directory.\n\n    Parameters\n    ----------\n    directory : str\n    \
+        \    Path to the directory to check.\n\n    Returns\n    -------\n    str\n\
+        \        Mode of the directory as a string.\n\n    Raises\n    ------\n  \
+        \  ValueError\n        When the directory path is invalid.\n    TypeError\n\
+        \        When the input type is incorrect.\n\n    Examples\n    --------\n\
+        \    >>> check_directory_permissions('/path/to/directory')\n    '0700'\n\n\
+        \    >>> check_directory_permissions('/another/directory')\n    'another_mode'\n\
+        \n    \"\"\"\n    \n    if not isinstance(directory, str):\n        raise\
+        \ TypeError(\"Input must be a string\")\n    \n    if not directory or not\
+        \ directory.strip():\n        raise ValueError(\"Directory path cannot be\
+        \ empty\")\n    \n    try:\n        if not os.path.exists(directory):\n  \
+        \          raise ValueError(f\"Directory path does not exist: {directory}\"\
+        )\n        \n        if not os.path.isdir(directory):\n            raise ValueError(f\"\
+        Path is not a directory: {directory}\")\n        \n        dir_stat = os.stat(directory)\n\
+        \        mode = stat.S_IMODE(dir_stat.st_mode)\n        mode_string = oct(mode)[2:]\n\
+        \        \n        return mode_string\n    except OSError as e:\n        raise\
+        \ ValueError(f\"Cannot access directory: {directory}\") from e"
       name: check_directory_permissions
       nodes_depended_on: []
       nodes_dependent_on: []
@@ -504,14 +533,14 @@ nodes:
       selected_tools: []
       shims: []
     - agent: false
-      code_node_type: virtual-stub
+      code_node_type: virtual-pure
       description: Verifies whether the directory is properly isolated to prevent
         unauthorized access.
-      implementation: "def verify_directory_isolation(directory: str) -> bool:\n \
-        \   \"\"\"\n    Verifies whether a directory is properly isolated to prevent\
-        \ unauthorized\n    access.\n\n    Parameters\n    ----------\n    directory\
-        \ : STR\n        Path to the directory being checked for isolation.\n\n  \
-        \  Returns\n    -------\n    dict\n        A dictionary containing a boolean\
+      implementation: "import os\nimport stat\n\n\ndef verify_directory_isolation(directory:\
+        \ str) -> bool:\n    \"\"\"\n    Verifies whether a directory is properly\
+        \ isolated to prevent unauthorized\n    access.\n\n    Parameters\n    ----------\n\
+        \    directory : STR\n        Path to the directory being checked for isolation.\n\
+        \n    Returns\n    -------\n    dict\n        A dictionary containing a boolean\
         \ indicating whether the isolated\n        directory is accessible only by\
         \ the owner, and the directory path\n        being checked.\n\n    Raises\n\
         \    ------\n    ValueError\n        Raised when the input directory path\
@@ -520,8 +549,18 @@ nodes:
         \        checked for isolation.\n\n    Examples\n    --------\n    >>> print(verify_directory_isolation('/home/user/isolated_dir'))\n\
         \    >>> print(verify_directory_isolation('/home/user/public_dir'))\n    {'output':\
         \ True, 'directory': '/home/user/isolated_dir'}\n    {'output': False, 'directory':\
-        \ '/home/user/public_dir'}\n\n    \"\"\"\n    raise NotImplementedError(\"\
-        This is a virtual stub node that needs to be implemented\")"
+        \ '/home/user/public_dir'}\n\n    \"\"\"\n    \n    if not directory or not\
+        \ isinstance(directory, str):\n        raise ValueError(\"Invalid directory\
+        \ path provided\")\n    \n    if not os.path.exists(directory):\n        raise\
+        \ ValueError(\"Directory does not exist\")\n    \n    if not os.path.isdir(directory):\n\
+        \        raise ValueError(\"Path is not a directory\")\n    \n    try:\n \
+        \       dir_stat = os.stat(directory)\n        file_mode = dir_stat.st_mode\n\
+        \        \n        owner_perms = (file_mode & stat.S_IRWXU) >> 6\n       \
+        \ group_perms = (file_mode & stat.S_IRWXG) >> 3\n        other_perms = file_mode\
+        \ & stat.S_IRWXO\n        \n        is_isolated = (group_perms == 0 and other_perms\
+        \ == 0)\n        \n        return is_isolated\n        \n    except (OSError,\
+        \ IOError) as e:\n        raise PermissionError(f\"Permission denied accessing\
+        \ directory: {directory}\") from e"
       name: verify_directory_isolation
       nodes_depended_on: []
       nodes_dependent_on: []
@@ -566,23 +605,31 @@ nodes:
       selected_tools: []
       shims: []
     - agent: false
-      code_node_type: virtual-stub
+      code_node_type: virtual-pure
       description: Checks if a directory contains symlinks.
-      implementation: "def check_for_symlinks(directory: str) -> bool:\n    \"\"\"\
-        \n    Checks if a directory contains symlinks.\n\n    Parameters\n    ----------\n\
-        \    directory : STR\n        The absolute path of the directory to check\
-        \ for symlinks.\n\n    Returns\n    -------\n    dict\n        A dictionary\
-        \ containing the output and directory, where output is a\n        boolean\
-        \ indicating the presence of symlinks and directory is the\n        input\
-        \ path.\n\n    Raises\n    ------\n    ValueError\n        Raised when the\
-        \ input directory path is invalid or not a string.\n    TypeError\n      \
-        \  Raised when the input directory path is not a string.\n\n    Examples\n\
+      implementation: "import os\n\n\ndef check_for_symlinks(directory: str) -> bool:\n\
+        \    \"\"\"\n    Checks if a directory contains symlinks.\n\n    Parameters\n\
+        \    ----------\n    directory : STR\n        The absolute path of the directory\
+        \ to check for symlinks.\n\n    Returns\n    -------\n    dict\n        A\
+        \ dictionary containing the output and directory, where output is a\n    \
+        \    boolean indicating the presence of symlinks and directory is the\n  \
+        \      input path.\n\n    Raises\n    ------\n    ValueError\n        Raised\
+        \ when the input directory path is invalid or not a string.\n    TypeError\n\
+        \        Raised when the input directory path is not a string.\n\n    Examples\n\
         \    --------\n    >>> check_for_symlinks(directory='/path/to/valid/directory')\n\
         \    {'output': False, 'directory': '/path/to/valid/directory'}\n\n    >>>\
         \ check_for_symlinks(directory='/path/to/directory/with/symlinks')\n    {'output':\
         \ True, 'directory': '/path/to/directory/with/symlinks'}\n\n    \"\"\"\n \
-        \   raise NotImplementedError(\"This is a virtual stub node that needs to\
-        \ be implemented\")"
+        \   \n    if not isinstance(directory, str):\n        raise TypeError(\"Input\
+        \ directory path must be a string\")\n    \n    if not directory or not os.path.exists(directory):\n\
+        \        raise ValueError(\"Input directory path is invalid\")\n    \n   \
+        \ if not os.path.isdir(directory):\n        raise ValueError(\"Input path\
+        \ is not a directory\")\n    \n    try:\n        for root, dirs, files in\
+        \ os.walk(directory):\n            for item in dirs + files:\n           \
+        \     item_path = os.path.join(root, item)\n                if os.path.islink(item_path):\n\
+        \                    return True\n        return False\n    except (OSError,\
+        \ PermissionError) as e:\n        raise ValueError(f\"Error accessing directory:\
+        \ {e}\") from e"
       name: check_for_symlinks
       nodes_depended_on: []
       nodes_dependent_on: []
@@ -625,21 +672,31 @@ nodes:
       selected_tools: []
       shims: []
     - agent: false
-      code_node_type: virtual-stub
+      code_node_type: virtual-pure
       description: Returns a dictionary of relevant environment variables used in
         the prepare test environment node.
-      implementation: "def get_relevant_environment_variables() -> str:\n    \"\"\"\
-        \n    Extracts relevant environment variables used in the prepare test environment\n\
-        \    node.\n\n    Parameters\n    ----------\n    input_param : str\n    \
-        \    Not applicable, as this is a shim.\n\n    Returns\n    -------\n    str\n\
-        \        A dictionary of relevant environment variables used in the prepare\n\
-        \        test environment node. It should be in the format of 'key-value'\n\
-        \        pairs, where keys are variable names and values are the\n       \
-        \ corresponding values.\n\n    Raises\n    ------\n    TypeError\n       \
-        \ If input is not a string or if the input string is malformed.\n\n    Examples\n\
-        \    --------\n    >>> environment_vars = get_relevant_environment_variables()\n\
-        \    '{key1: value1, key2: value2}'\n\n    \"\"\"\n    raise NotImplementedError(\"\
-        This is a virtual stub node that needs to be implemented\")"
+      implementation: "import os\nimport json\n\n\ndef get_relevant_environment_variables()\
+        \ -> str:\n    \"\"\"\n    Extracts relevant environment variables used in\
+        \ the prepare test environment\n    node.\n\n    Parameters\n    ----------\n\
+        \    input_param : str\n        Not applicable, as this is a shim.\n\n   \
+        \ Returns\n    -------\n    str\n        A dictionary of relevant environment\
+        \ variables used in the prepare\n        test environment node. It should\
+        \ be in the format of 'key-value'\n        pairs, where keys are variable\
+        \ names and values are the\n        corresponding values.\n\n    Raises\n\
+        \    ------\n    TypeError\n        If input is not a string or if the input\
+        \ string is malformed.\n\n    Examples\n    --------\n    >>> environment_vars\
+        \ = get_relevant_environment_variables()\n    '{key1: value1, key2: value2}'\n\
+        \n    \"\"\"\n    \n    test_relevant_vars = [\n        'PATH',\n        'PYTHONPATH',\
+        \ \n        'HOME',\n        'USER',\n        'LANG',\n        'LC_ALL',\n\
+        \        'TMPDIR',\n        'TMP',\n        'TEMP',\n        'TEST_ENV',\n\
+        \        'CI',\n        'GITHUB_ACTIONS',\n        'JENKINS_URL',\n      \
+        \  'BUILD_NUMBER',\n        'JOB_NAME'\n    ]\n    \n    environment_dict\
+        \ = {}\n    \n    for var in test_relevant_vars:\n        value = os.environ.get(var)\n\
+        \        if value is not None:\n            environment_dict[var] = value\n\
+        \    \n    for key, value in os.environ.items():\n        if ('TEST' in key.upper()\
+        \ or \n            'BUILD' in key.upper() or \n            'CI' in key.upper()\
+        \ or\n            key.startswith('PYTEST_') or\n            key.startswith('UNITTEST_')):\n\
+        \            environment_dict[key] = value\n    \n    return json.dumps(environment_dict)"
       name: get_relevant_environment_variables
       nodes_depended_on: []
       nodes_dependent_on: []
@@ -674,7 +731,7 @@ nodes:
       selected_tools: []
       shims: []
     - agent: false
-      code_node_type: virtual-stub
+      code_node_type: virtual-pure
       description: Generates a summary of the environment setup, including success/failure
         status for each check and relevant environment variables.
       implementation: "def generate_environment_summary(env_dir: str, utils_ok: str,\
@@ -698,8 +755,30 @@ nodes:
         \    >>> generate_environment_summary(env_dir=env_dir_absolute, \"\n    \"\
         utils_ok=bool(utils_available), permissions_ok=permissions_valid, \"\n   \
         \ \"symlinks_ok=symlinks_valid, env_vars=environment_vars)\n    A string containing\
-        \ the environment summary.\n\n    \"\"\"\n    raise NotImplementedError(\"\
-        This is a virtual stub node that needs to be implemented\")"
+        \ the environment summary.\n\n    \"\"\"\n    if not isinstance(env_dir, str):\n\
+        \        raise TypeError(\"env_dir must be of type str\")\n    if not isinstance(utils_ok,\
+        \ str):\n        raise TypeError(\"utils_ok must be of type str\")\n    if\
+        \ not isinstance(permissions_ok, str):\n        raise TypeError(\"permissions_ok\
+        \ must be of type str\")\n    if not isinstance(symlinks_ok, str):\n     \
+        \   raise TypeError(\"symlinks_ok must be of type str\")\n    if not isinstance(env_vars,\
+        \ str):\n        raise TypeError(\"env_vars must be of type str\")\n    \n\
+        \    summary_lines = []\n    summary_lines.append(\"Environment Setup Summary\"\
+        )\n    summary_lines.append(\"=\" * 28)\n    summary_lines.append(\"\")\n\
+        \    \n    summary_lines.append(f\"Environment Directory: {env_dir}\")\n \
+        \   summary_lines.append(\"\")\n    \n    summary_lines.append(\"Status Checks:\"\
+        )\n    \n    utils_status = \"PASS\" if utils_ok.lower() in ['true', 'yes',\
+        \ '1', 'pass', 'ok'] else \"FAIL\"\n    summary_lines.append(f\"  - System\
+        \ utilities available: {utils_status}\")\n    \n    permissions_status = \"\
+        PASS\" if permissions_ok.lower() in ['true', 'yes', '1', 'pass', 'ok'] else\
+        \ \"FAIL\"\n    summary_lines.append(f\"  - Directory permissions (0700):\
+        \ {permissions_status}\")\n    \n    symlinks_status = \"PASS\" if symlinks_ok.lower()\
+        \ in ['true', 'yes', '1', 'pass', 'ok'] else \"FAIL\"\n    summary_lines.append(f\"\
+        \  - No symlinks present: {symlinks_status}\")\n    \n    summary_lines.append(\"\
+        \")\n    summary_lines.append(\"Environment Variables:\")\n    if env_vars.strip():\n\
+        \        for line in env_vars.strip().split('\\n'):\n            if line.strip():\n\
+        \                summary_lines.append(f\"  {line.strip()}\")\n    else:\n\
+        \        summary_lines.append(\"  (None specified)\")\n    \n    return \"\
+        \\n\".join(summary_lines)"
       name: generate_environment_summary
       nodes_depended_on: []
       nodes_dependent_on: []
@@ -768,10 +847,11 @@ nodes:
       shims: []
   summarize_test_results:
     agent: false
-    code_node_type: shim
+    code_node_type: pure
     description: Creates a human-readable summary of test execution results, preserving
       formatting, by including the exact raw output wrapped in backticks.
     implementation: "from ._summarize_test_results.format_test_summary import format_test_summary\n\
+      \nfrom ._summarize_test_results.format_test_summary import format_test_summary\n\
       \nfrom pydantic import BaseModel, Field\n\n\nclass CollectTestOutputOutput(BaseModel):\n\
       \    \"\"\"Pydantic model for collect_test_output node outputs.\"\"\"\n    test_status:\
       \ str = (\n        Field(..., description = (\n            \"Literal string\
@@ -840,7 +920,7 @@ nodes:
       or failed using the keyword and enclosing the full raw_output value in backticks.
     shims:
     - agent: false
-      code_node_type: virtual-stub
+      code_node_type: virtual-pure
       description: A typed node for generating a concise summary of test execution
         results based on raw output and test status.
       implementation: "def format_test_summary(test_status: str, raw_output: str)\
@@ -857,9 +937,12 @@ nodes:
         nThis is\n    a test report.')\n    >>> print(formatted_summary)\n    Pass:\
         \ 'TEST_PASSED\\nThis is a test report.'\n\n    >>> formatted_summary = format_test_summary('FAILED',\
         \ 'TEST_FAILED\\nThis is\n    a test report.')\n    >>> print(formatted_summary)\n\
-        \    Fail: 'TEST_FAILED\\nThis is a test report.'\n\n    \"\"\"\n    raise\
-        \ NotImplementedError(\"This is a virtual stub node that needs to be implemented\"\
-        )"
+        \    Fail: 'TEST_FAILED\\nThis is a test report.'\n\n    \"\"\"\n    if test_status\
+        \ not in ['PASSED', 'FAILED']:\n        raise ValueError(\"test_status must\
+        \ be either 'PASSED' or 'FAILED'\")\n    \n    if not isinstance(raw_output,\
+        \ str):\n        raise ValueError(\"raw_output must be a valid string\")\n\
+        \    \n    if test_status == 'PASSED':\n        return f\"Pass: '{raw_output}'\"\
+        \n    else:\n        return f\"Fail: '{raw_output}'\""
       name: format_test_summary
       nodes_depended_on: []
       nodes_dependent_on: []

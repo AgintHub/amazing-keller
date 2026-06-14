@@ -1,3 +1,6 @@
+import os
+
+
 def get_absolute_path(path: str) -> str:
     """
     Obtain the absolute path of a directory or file.
@@ -28,4 +31,15 @@ def get_absolute_path(path: str) -> str:
     /current_directory
 
     """
-    raise NotImplementedError("This is a virtual stub node that needs to be implemented")
+    
+    if not isinstance(path, str):
+        raise TypeError("The input path is not a string")
+    
+    if not path:
+        raise ValueError("The input path does not exist or is invalid")
+    
+    try:
+        absolute_path = os.path.abspath(path)
+        return absolute_path
+    except Exception:
+        raise ValueError("When the input path does not exist or is invalid")
