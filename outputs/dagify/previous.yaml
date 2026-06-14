@@ -1,48 +1,85 @@
-name: test_workflow
+name: test
 dag_type: plain_text
-description: Workflow to execute various test operations
+description: Test plan to execute test objective
 nodes:
-  test_objective:
-    name: test_objective
+  determine_test_objective:
+    name: determine_test_objective
     nodes_depended_on: []
     nodes_dependent_on: []
-    prompt: The objective is to test. What specific type of test is to be executed?
-    description: Identify the specific type of test to execute
+    prompt: Define a clear, explicit objective for this test.
+    description: Determine what needs to be tested.
     agent: false
-  setup_environment:
-    name: setup_environment
+  specify_test_preconditions:
+    name: specify_test_preconditions
     nodes_depended_on:
-    - test_objective
+    - determine_test_objective
     nodes_dependent_on: []
-    prompt: Setup the environment for testing. What tools or software are required?
-    description: Configure the necessary environment for testing
+    prompt: List all preconditions required to successfully complete the test. Include
+      any setup, prerequisites, or assumptions.
+    description: Establish required setup for the test.
     agent: false
-  execute_test_cases:
-    name: execute_test_cases
+  formulate_test_hypothesis:
+    name: formulate_test_hypothesis
     nodes_depended_on:
-    - setup_environment
+    - determine_test_objective
+    - specify_test_preconditions
     nodes_dependent_on: []
-    prompt: Define and execute test cases for the given objective. What specific scenarios
-      or data is to be tested?
-    description: Design and execute a set of test cases to validate the objective
+    prompt: Based on the objective and preconditions, formulate a clear, testable
+      hypothesis.
+    description: Establish a clear, testable hypothesis.
     agent: false
-  gather_test_results:
-    name: gather_test_results
+  design_test_plan_details:
+    name: design_test_plan_details
     nodes_depended_on:
-    - execute_test_cases
+    - specify_test_preconditions
+    - formulate_test_hypothesis
     nodes_dependent_on: []
-    prompt: Compile and analyze the results of the executed test cases. Is the objective
-      met?
-    description: Aggregate and evaluate the outcomes of the test cases to determine
-      if the objective has been met
+    prompt: Describe the step-by-step procedure to test the hypothesis. Include any
+      specific testing procedures, scripts, or tools.
+    description: Create a detailed plan to execute the test.
     agent: false
-  report_test_outcome:
-    name: report_test_outcome
+  validate_test_plan_details:
+    name: validate_test_plan_details
     nodes_depended_on:
-    - gather_test_results
+    - design_test_plan_details
     nodes_dependent_on: []
-    prompt: Document the outcome of the test. Was the objective met? Provide a summary
-      of the results
-    description: Create a written report detailing the outcome of the test and the
-      satisfaction of the objective
+    prompt: Check the test plan for completeness, accuracy, and feasibility. Verify
+      that the test plan matches the hypothesis.
+    description: Validate the test plan to ensure it meets the requirements.
+    agent: false
+  execute_test_plan:
+    name: execute_test_plan
+    nodes_depended_on:
+    - validate_test_plan_details
+    nodes_dependent_on: []
+    prompt: Implement the test plan, using the procedures outlined in the plan, to
+      test the hypothesis.
+    description: Execute the test plan and collect data.
+    agent: false
+  collect_test_data:
+    name: collect_test_data
+    nodes_depended_on:
+    - execute_test_plan
+    nodes_dependent_on: []
+    prompt: Gather all relevant data and observations from the test, including any
+      output, error messages, or logs.
+    description: Collect all relevant data to analyze the results.
+    agent: false
+  analyze_test_results:
+    name: analyze_test_results
+    nodes_depended_on:
+    - collect_test_data
+    nodes_dependent_on: []
+    prompt: Evaluate the collected data to determine whether it supports or contradicts
+      the test hypothesis.
+    description: Analyze the test results and draw conclusions.
+    agent: false
+  document_test_findings:
+    name: document_test_findings
+    nodes_depended_on:
+    - analyze_test_results
+    nodes_dependent_on: []
+    prompt: Summarize the results, including any conclusions, recommendations, or
+      next steps.
+    description: Document the findings and draw conclusions.
     agent: false

@@ -1,48 +1,63 @@
 name: test_workflow
 dag_type: plain_text
-description: Workflow to execute various test operations
+description: Basic workflow for testing a system or application
 nodes:
-  test_objective:
-    name: test_objective
+  initiate_testing:
+    name: initiate_testing
     nodes_depended_on: []
     nodes_dependent_on: []
-    prompt: The objective is to test. What specific type of test is to be executed?
-    description: Identify the specific type of test to execute
+    prompt: What specific features or components of the system/application are to
+      be tested?
+    description: Determine the scope of the testing process
     agent: false
-  setup_environment:
-    name: setup_environment
+  plan_test_cases:
+    name: plan_test_cases
     nodes_depended_on:
-    - test_objective
+    - initiate_testing
     nodes_dependent_on: []
-    prompt: Setup the environment for testing. What tools or software are required?
-    description: Configure the necessary environment for testing
+    prompt: Create test cases for each feature/component, including input data and
+      expected results
+    description: Develop and document test cases
     agent: false
-  execute_test_cases:
-    name: execute_test_cases
+  conduct_manual_testing:
+    name: conduct_manual_testing
     nodes_depended_on:
-    - setup_environment
+    - plan_test_cases
     nodes_dependent_on: []
-    prompt: Define and execute test cases for the given objective. What specific scenarios
-      or data is to be tested?
-    description: Design and execute a set of test cases to validate the objective
+    prompt: Perform manual testing using the test cases developed, record observations,
+      and document findings
+    description: Performs manual testing based on prior planning
     agent: false
-  gather_test_results:
-    name: gather_test_results
+  analyze_manual_test_results:
+    name: analyze_manual_test_results
     nodes_depended_on:
-    - execute_test_cases
+    - conduct_manual_testing
     nodes_dependent_on: []
-    prompt: Compile and analyze the results of the executed test cases. Is the objective
-      met?
-    description: Aggregate and evaluate the outcomes of the test cases to determine
-      if the objective has been met
+    prompt: Document test results, noting pass/fail, and summarize any observations
+    description: Review, analyze and report on outcomes of manual testing
     agent: false
-  report_test_outcome:
-    name: report_test_outcome
+  conduct_automated_testing:
+    name: conduct_automated_testing
     nodes_depended_on:
-    - gather_test_results
+    - plan_test_cases
     nodes_dependent_on: []
-    prompt: Document the outcome of the test. Was the objective met? Provide a summary
-      of the results
-    description: Create a written report detailing the outcome of the test and the
-      satisfaction of the objective
+    prompt: Execute automated tests for each feature/component, reporting results
+    description: Execute automated tests against the system/application
+    agent: false
+  analyze_automated_test_results:
+    name: analyze_automated_test_results
+    nodes_depended_on:
+    - conduct_automated_testing
+    nodes_dependent_on: []
+    prompt: Review automated test results, identifying successes and areas for improvement
+    description: Review and evaluate outcomes of automated testing
+    agent: false
+  compile_results_and_reports:
+    name: compile_results_and_reports
+    nodes_depended_on:
+    - analyze_manual_test_results
+    - analyze_automated_test_results
+    nodes_dependent_on: []
+    prompt: Compile test results, highlighting successes and recommending improvements
+    description: Aggregates and compiles findings into comprehensive report
     agent: false
